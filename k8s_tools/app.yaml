@@ -1,0 +1,48 @@
+apiVersion: 0.0.1
+kind: ksonnet.io/app
+libraries:
+  core:
+    gitVersion:
+      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      refSpec: master
+    name: core
+    registry: kubeflow
+  seldon-core:
+    gitVersion:
+      commitSha: 77e6c18f76cd1ee847467d21557c87037d50a149
+      refSpec: master
+    name: seldon-core
+    registry: seldon-core
+  tf-job:
+    gitVersion:
+      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      refSpec: master
+    name: tf-job
+    registry: kubeflow
+  tf-serving:
+    gitVersion:
+      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      refSpec: master
+    name: tf-serving
+    registry: kubeflow
+name: k8s
+registries:
+  incubator:
+    gitVersion:
+      commitSha: 422d521c05aa905df949868143b26445f5e4eda5
+      refSpec: master
+    protocol: github
+    uri: github.com/ksonnet/parts/tree/master/incubator
+  kubeflow:
+    gitVersion:
+      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      refSpec: master
+    protocol: github
+    uri: github.com/kubeflow/kubeflow/tree/master/kubeflow
+  seldon-core:
+    gitVersion:
+      commitSha: 77e6c18f76cd1ee847467d21557c87037d50a149
+      refSpec: master
+    protocol: github
+    uri: github.com/SeldonIO/seldon-core/tree/master/seldon-core
+version: 0.0.1
