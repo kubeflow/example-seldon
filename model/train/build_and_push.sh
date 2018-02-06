@@ -1,4 +1,4 @@
-REPO=$2
+REPO=$1
 
 until docker ps; 
 do sleep 3; 
