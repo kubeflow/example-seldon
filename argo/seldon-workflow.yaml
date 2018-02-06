@@ -1,0 +1,103 @@
+# This example demonstrates the use of a git repo as a hard-wired 
+# input artifact. The argo repo is cloned to its target destination
+# at '/src' for the main container to consume.
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: seldon-package-
+spec:
+  entrypoint: workflow
+  volumes:
+  - name: my-secret-vol
+    secret:
+      secretName: docker-credentials     # name of an existing k8s secret
+  templates:
+  - name: workflow
+    steps:
+    - - name: train
+        template: tfjob
+    - - name: run-build 
+        template: build-and-push
+        arguments:
+          parameters:
+          - name: repo
+            value: "seldonio"
+  - name: build-and-push
+    inputs:
+      artifacts:
+      - name: argo-source
+        path: /src/kubeflow-seldon-example
+        git:
+          repo: https://github.com/SeldonIO/kubeflow-seldon-example.git
+          revision: "master"
+      parameters:
+      - name: repo
+    container:
+      image: docker:17.10
+      command: [sh,-c]
+      args: ["cd /src/kubeflow-seldon-example/model/train ; ./build_and_push.sh {{inputs.parameters.repo}}"]
+      env:
+      - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
+        value: 127.0.0.1
+      - name: DOCKER_USERNAME  # name of env var
+        valueFrom:
+          secretKeyRef:
+            name: docker-credentials     # name of an existing k8s secret
+            key: username     # 'key' subcomponent of the secret
+      - name: DOCKER_PASSWORD  # name of env var
+        valueFrom:
+          secretKeyRef:
+            name: docker-credentials     # name of an existing k8s secret
+            key: password     # 'key' subcomponent of the secret
+      volumeMounts:
+      - name: my-secret-vol     # mount file containing secret at /secret/mountpath
+        mountPath: "/secret/mountpath"
+    sidecars:
+    - name: dind
+      image: docker:17.10-dind          #Docker already provides an image for running a Docker daemon
+      securityContext:
+        privileged: true                #the Docker daemon can only run in a privileged container
+      # mirrorVolumeMounts will mount the same volumes specified in the main container
+      # to the sidecar (including artifacts), at the same mountPaths. This enables
+      # dind daemon to (partially) see the same filesystem as the main container in
+      # order to use features such as docker volume binding.
+      mirrorVolumeMounts: true
+  - name: tfjob
+    resource:                   #indicates that this is a resource template
+      action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
+      # The successCondition and failureCondition are optional expressions.
+      # If failureCondition is true, the step is considered failed.
+      # If successCondition is true, the step is considered successful.
+      # They use kubernetes label selection syntax and can be applied against any field
+      # of the resource (not just labels). Multiple AND conditions can be represented by comma
+      # delimited expressions.
+      # For more details: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+      successCondition: status.state == "Succeeded"
+      manifest: |   #put your kubernetes spec here
+       apiVersion: "tensorflow.org/v1alpha1"
+       kind: "TfJob"
+       metadata: 
+         name: "mnist-train"
+         namespace: "default"
+       spec: 
+         replicaSpecs: 
+           - 
+             replicas: 1
+             template: 
+               spec: 
+                 containers: 
+                   - 
+                     image: "seldonio/deepmnistclassifier_trainer:0.1"
+                     name: "tensorflow"
+                     volumeMounts: 
+                       - 
+                         mountPath: "/data"
+                         name: "persistent-storage"
+                 restartPolicy: "OnFailure"
+                 volumes: 
+                   - 
+                     name: "persistent-storage"
+                     persistentVolumeClaim: 
+                       claimName: "ml-data"
+             tfReplicaType: "MASTER"
+
