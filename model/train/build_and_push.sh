@@ -1,11 +1,9 @@
-SRC=$1
 REPO=$2
 
 until docker ps; 
 do sleep 3; 
 done; 
 
-cd ${SRC}/model/train 
 docker build --force-rm=true -t ${REPO}/deepmnistclassifier_trainer:0.1 . 
 docker images 
 echo $DOCKER_PASSWORD | docker login --username=$DOCKER_USERNAME --password-stdin 
