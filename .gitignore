@@ -18,3 +18,6 @@ cluster-manager/.m2/
 _*.yaml
 _*.json
 
+
+model/runtime/build/
+
