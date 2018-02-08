@@ -7,6 +7,12 @@ metadata:
   generateName: seldon-package-
 spec:
   entrypoint: workflow
+  arguments:
+    parameters:
+    - name: version
+      value: 0.1
+    - name: tfjob-version-hack
+      value: 1
   volumes:
   - name: my-secret-vol
     secret:
@@ -14,14 +20,18 @@ spec:
   templates:
   - name: workflow
     steps:
-    - - name: train
-        template: tfjob
-    - - name: run-build 
+    - - name: build-push 
         template: build-and-push
         arguments:
           parameters:
           - name: repo
             value: "seldonio"
+    - - name: train
+        template: tfjob
+        arguments:
+          parameters:
+          - name: version
+            value: "0.1"
   - name: build-and-push
     inputs:
       artifacts:
@@ -35,7 +45,7 @@ spec:
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/kubeflow-seldon-example/model/train ; ./build_and_push.sh {{inputs.parameters.repo}}"]
+      args: ["cd /src/kubeflow-seldon-example/model/train ; ./build_and_push.sh {{workflow.parameters.version}} {{inputs.parameters.repo}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
@@ -72,12 +82,12 @@ spec:
       # of the resource (not just labels). Multiple AND conditions can be represented by comma
       # delimited expressions.
       # For more details: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-      successCondition: status.state == "Succeeded"
+      successCondition: status.state == Succeeded
       manifest: |   #put your kubernetes spec here
        apiVersion: "tensorflow.org/v1alpha1"
        kind: "TfJob"
        metadata: 
-         name: "mnist-train"
+         name: mnist-train-{{workflow.parameters.tfjob-version-hack}}
          namespace: "default"
        spec: 
          replicaSpecs: 
@@ -87,7 +97,7 @@ spec:
                spec: 
                  containers: 
                    - 
-                     image: "seldonio/deepmnistclassifier_trainer:0.1"
+                     image: "seldonio/deepmnistclassifier_trainer:{{workflow.parameters.version}}"
                      name: "tensorflow"
                      volumeMounts: 
                        - 
