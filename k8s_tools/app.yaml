@@ -1,6 +1,12 @@
 apiVersion: 0.0.1
 kind: ksonnet.io/app
 libraries:
+  argo:
+    gitVersion:
+      commitSha: e686cf77059a7cd7f101bf7933d238d86f4dfb54
+      refSpec: master
+    name: argo
+    registry: kubeflow
   core:
     gitVersion:
       commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
@@ -35,7 +41,7 @@ registries:
     uri: github.com/ksonnet/parts/tree/master/incubator
   kubeflow:
     gitVersion:
-      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      commitSha: e686cf77059a7cd7f101bf7933d238d86f4dfb54
       refSpec: master
     protocol: github
     uri: github.com/kubeflow/kubeflow/tree/master/kubeflow

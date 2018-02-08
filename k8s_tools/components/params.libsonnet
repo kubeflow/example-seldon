@@ -29,5 +29,9 @@
       withApife: "false",
       withRbac: "true",
     },
+    argo: {
+      name: "argo",
+      namespace: "default",
+    },
   },
 }
