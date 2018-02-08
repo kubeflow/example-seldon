@@ -6,7 +6,12 @@ do sleep 3;
 done; 
 
 docker run -v  ${PWD}:/my_model seldonio/core-python-wrapper:0.6 /my_model DeepMnist ${VERSION} seldonio --image-name=deepmnistclassifier_runtime
+cd ./build
+./build_image.sh
 docker images 
 echo $DOCKER_PASSWORD | docker login --username=$DOCKER_USERNAME --password-stdin 
-docker push ${REPO}/deepmnistclassifier_runtime:${VERSION}
+./push_image.sh
+
+
+
 
