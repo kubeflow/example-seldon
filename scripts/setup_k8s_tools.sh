@@ -11,3 +11,4 @@ ks pkg install seldon-core/seldon-core
 ks generate seldon-core seldon-core --withApife=false --withRbac=true
 ks pkg install kubeflow/argo
 ks prototype use io.ksonnet.pkg.argo argo --namespace default --name argo
+cp ../k8s_setup/pvc.json components/pvc.jsonnet

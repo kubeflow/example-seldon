@@ -11,6 +11,10 @@ spec:
     parameters:
     - name: version
       value: 0.1
+    - name: github-user
+      value: SeldonIO
+    - name: docker-user
+      value: seldonio
   volumes:
   - name: my-secret-vol
     secret:
@@ -20,30 +24,20 @@ spec:
     steps:
     - - name: build-push 
         template: build-and-push
-        arguments:
-          parameters:
-          - name: repo
-            value: "seldonio"
     - - name: serve
         template: seldon
-        arguments:
-          parameters:
-          - name: version
-            value: "0.1"
   - name: build-and-push
     inputs:
       artifacts:
       - name: argo-source
         path: /src/kubeflow-seldon-example
         git:
-          repo: https://github.com/SeldonIO/kubeflow-seldon-example.git
+          repo: https://github.com/{{workflow.parameters.github-user}}/kubeflow-seldon-example.git
           revision: "master"
-      parameters:
-      - name: repo
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/kubeflow-seldon-example/model/runtime ; ./wrap.sh {{workflow.parameters.version}} {{inputs.parameters.repo}}"]
+      args: ["cd /src/kubeflow-seldon-example/model/runtime ; ./wrap.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1

@@ -25,10 +25,6 @@ spec:
         template: build-and-push
     - - name: train
         template: tfjob
-        arguments:
-          parameters:
-          - name: version
-            value: "0.1"
   - name: build-and-push
     inputs:
       artifacts:
@@ -73,6 +69,12 @@ spec:
        metadata: 
          name: mnist-train-{{workflow.parameters.tfjob-version-hack}}
          namespace: "default"
+         ownerReferences:
+         - apiVersion: argoproj.io/v1alpha1
+           kind: Workflow
+           controller: true
+           name: kubeflow-train
+           uid: {{workflow.uid}}
        spec: 
          replicaSpecs: 
            - 
