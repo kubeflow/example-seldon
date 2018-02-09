@@ -15,7 +15,11 @@ In the follow we will:
  1. [Create a GKE Cluster](#create-a-kubernetes-cluster-on-gke) 
  1. [Setup Kubernetes with kubeflow and seldon-core](#install-tools)
  1. [Clone this project](#clone-this-project-from-github)
-
+ 1. [Install kubeflow and seldon-core on your cluster](#install-kubeflow-and-seldon-core-on-your-cluster)
+ 1. [Do the data science](#data-science)
+ 1. [Train the model](#train-model)
+ 1. [Serve the model](#serve-model)
+ 1. [Get predictions](#get-predictions)
 
 # Create a Kubernetes Cluster on GKE
 
@@ -55,7 +59,6 @@ git clone https://github.com/SeldonIO/kubeflow-seldon-example
 
 # Install kubeflow and seldon-core on your cluster
 
-## RBAC Setup
 If using RBAC create a clusterrolebinding for your GCP user
 
 ```
@@ -68,23 +71,67 @@ If using RBAC provide the default serviceaccount with cluster-admin to allow arg
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=default:default
 ```
 
-## Launch tools
-
-
 The ksonnet packages have already been setup so you can simply do:
 
 ```bash
 cd k8s_tools && ks apply default
 ```
 
-### Details
-
-  * The steps to set up this ksonnet app are show in ```scripts/setup_k8s_tools.sh```
-  * A persistent volume claim is created - see ```k8s_tools/components/pvc.jsonnet```
+  * The steps to set up this ksonnet app are show [here](scripts/setup_k8s_tools.sh)
+  * A [persistent volume claim](https://github.com/SeldonIO/seldon-core) is added to the components.
 
 
-### Data Science
+# Data Science
 
  * [A simple model for MNIST](model/train/create_model.py)
- * [A runtime inference module](model/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment can be found 
+ * [A runtime inference module](model/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
 
+# Train Model
+
+We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in ```k8s_setup/docker-credentials-secret.yaml```
+
+```yaml
+apiVersion: v1
+data:
+  password: <base 64 password>
+  username: <base 64 username>
+kind: Secret
+metadata:
+  name: docker-credentials
+  namespace: default
+type: Opaque
+```
+
+Apply the secret:
+
+```bash
+kubectl create my_docker_credentials.yaml
+```
+
+To dockerize our model training and run it we create:
+
+  * [```model/train/build_and_push.sh```](model/train/build_and_push.sh) that will build an image for our Tensorflow training and push to our repo.
+  * An Argo workflow [```training-mnist-workflow.yaml```](training-mnist-workflow.yaml) is created which:
+    * Clones the project from github
+    * Runs the build and push script (using DockerInDocker)
+    * Starts a kubeflow TfJob to train the model and save the results to the persistent volume
+
+You can launch this workflow with
+
+```
+argo submit training-mnist-workflow.yaml
+```
+
+# Serve Model
+
+To wrap our model as a Docker container and launch we create:
+
+ * [```model/runtime/wrap.sh```](model/runtime/wrap.sh) to wrap model using the seldon-core python wrapper.
+ * An Argo workflow [```serving-mnist-workflow.yaml```] which:
+    * Wraps the runtime model, builds a docker container for it and pushes it to your repo
+    * Starts a seldon deployment that will run and expose your model
+
+
+# Get Predictions
+
+The cluster is using [Ambassador](https://www.getambassador.io/) so your model will be exposed by REST and gRPC on the Ambassador reverse proxy.

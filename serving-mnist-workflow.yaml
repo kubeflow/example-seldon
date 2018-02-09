@@ -4,7 +4,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: seldon-package-
+  generateName: seldon-deploy-
 spec:
   entrypoint: workflow
   arguments:
@@ -73,13 +73,6 @@ spec:
   - name: seldon
     resource:                   #indicates that this is a resource template
       action: apply             #can be any kubectl action (e.g. create, delete, apply, patch)
-      # The successCondition and failureCondition are optional expressions.
-      # If failureCondition is true, the step is considered failed.
-      # If successCondition is true, the step is considered successful.
-      # They use kubernetes label selection syntax and can be applied against any field
-      # of the resource (not just labels). Multiple AND conditions can be represented by comma
-      # delimited expressions.
-      # For more details: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
       #successCondition: ? 
       manifest: |   #put your kubernetes spec here
        apiVersion: "machinelearning.seldon.io/v1alpha1"
