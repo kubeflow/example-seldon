@@ -1,3 +1,4 @@
+local env = std.extVar("__ksonnet/environments");
 local params = std.extVar("__ksonnet/params").components["kubeflow-core"];
 // TODO(https://github.com/ksonnet/ksonnet/issues/222): We have to add namespace as an explicit parameter
 // because ksonnet doesn't support inheriting it from the environment yet.
@@ -71,6 +72,7 @@ std.prune(k.core.v1.list.new([
   tfjob.parts(namespace).serviceAccount,
   tfjob.parts(namespace).operatorRole,
   tfjob.parts(namespace).operatorRoleBinding,
+  tfjob.parts(namespace).crd,
 
   // TFJob controller ui
   tfjob.parts(namespace).ui(tfJobImage),

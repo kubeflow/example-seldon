@@ -64,8 +64,8 @@ spec:
       action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
       successCondition: status.state == Succeeded
       manifest: |   #put your kubernetes spec here
-       apiVersion: "tensorflow.org/v1alpha1"
-       kind: "TfJob"
+       apiVersion: "kubeflow.org/v1alpha1"
+       kind: "TFJob"
        metadata: 
          name: mnist-train-{{workflow.parameters.tfjob-version-hack}}
          namespace: "default"

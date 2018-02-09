@@ -116,11 +116,16 @@ To dockerize our model training and run it we create:
     * Runs the build and push script (using DockerInDocker)
     * Starts a kubeflow TfJob to train the model and save the results to the persistent volume
 
-You can launch this workflow with
+You can launch this workflow with the following:
 
 ```
-argo submit training-mnist-workflow.yaml
+argo submit training-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
 ```
+
+There is a hack to ensure a random TfJob due to this issue in [kubeflow](https://github.com/tensorflow/k8s/issues/322).
+
+When its finished, delete it, as the the current persistent volume is a GCS disk with ReadOnlyOnce so we need to free the persistent volume claim.
+
 
 # Serve Model
 
@@ -131,7 +136,20 @@ To wrap our model as a Docker container and launch we create:
     * Wraps the runtime model, builds a docker container for it and pushes it to your repo
     * Starts a seldon deployment that will run and expose your model
 
+```
+argo submit serving-mnist-workflow.yaml
+```
+
 
 # Get Predictions
 
 The cluster is using [Ambassador](https://www.getambassador.io/) so your model will be exposed by REST and gRPC on the Ambassador reverse proxy.
+
+To expose the ambassador reverse proxy to a local port do
+
+```
+kubectl port-forward $(kubectl get pods -n default -l service=ambassador -o jsonpath='{.items[0].metadata.name}') -n default 8002:80
+```
+
+You can test the service by following the example [jupyter notebook](notebooks/example.ipynb)
+

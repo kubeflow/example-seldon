@@ -33,7 +33,7 @@
         selector: {
           service: "ambassador",
         },
-        type: "LoadBalancer",
+        type: "ClusterIP",
       },
     },  // service
 

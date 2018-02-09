@@ -3,35 +3,35 @@ kind: ksonnet.io/app
 libraries:
   argo:
     gitVersion:
-      commitSha: e686cf77059a7cd7f101bf7933d238d86f4dfb54
+      commitSha: d5caf230ff50260c1a6565db35edeeddd5d407e6
       refSpec: master
     name: argo
     registry: kubeflow
   core:
     gitVersion:
-      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      commitSha: d5caf230ff50260c1a6565db35edeeddd5d407e6
       refSpec: master
     name: core
     registry: kubeflow
   seldon-core:
     gitVersion:
-      commitSha: 77e6c18f76cd1ee847467d21557c87037d50a149
+      commitSha: 9ef8cfc1486c7b8f903f8325ed8036ce44f95fd1
       refSpec: master
     name: seldon-core
     registry: seldon-core
   tf-job:
     gitVersion:
-      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      commitSha: d5caf230ff50260c1a6565db35edeeddd5d407e6
       refSpec: master
     name: tf-job
     registry: kubeflow
   tf-serving:
     gitVersion:
-      commitSha: da6d4b631f93fedb38fac52fd1186dfde861fd98
+      commitSha: d5caf230ff50260c1a6565db35edeeddd5d407e6
       refSpec: master
     name: tf-serving
     registry: kubeflow
-name: k8s
+name: k8s_tools
 registries:
   incubator:
     gitVersion:
@@ -41,13 +41,13 @@ registries:
     uri: github.com/ksonnet/parts/tree/master/incubator
   kubeflow:
     gitVersion:
-      commitSha: e686cf77059a7cd7f101bf7933d238d86f4dfb54
+      commitSha: d5caf230ff50260c1a6565db35edeeddd5d407e6
       refSpec: master
     protocol: github
     uri: github.com/kubeflow/kubeflow/tree/master/kubeflow
   seldon-core:
     gitVersion:
-      commitSha: 77e6c18f76cd1ee847467d21557c87037d50a149
+      commitSha: 9ef8cfc1486c7b8f903f8325ed8036ce44f95fd1
       refSpec: master
     protocol: github
     uri: github.com/SeldonIO/seldon-core/tree/master/seldon-core
