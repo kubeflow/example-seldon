@@ -20,3 +20,4 @@ _*.json
 
 
 models/tf_mnist/runtime/build/
+models/sk_mnist/runtime/build/
