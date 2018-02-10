@@ -6,7 +6,7 @@ class SkMnist(object):
         self.clf = joblib.load('/data/sk.pkl') 
 
     def predict(self,X,feature_names):
-        predictions = self.clf.predict(X)
+        predictions = self.clf.predict_proba(X)
         return predictions
 
     
