@@ -126,6 +126,9 @@ There is a hack to ensure a random TfJob due to this issue in [kubeflow](https:/
 
 When its finished, delete it, as the the current persistent volume is a GCS disk with ReadOnlyOnce so we need to free the persistent volume claim.
 
+```
+argo delete --all
+```
 
 # Serve Model
 
