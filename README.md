@@ -7,6 +7,13 @@ Using:
  
 The example will be the MNIST handwriiten digit classification task.
 
+Requirements:
+
+  * Ability to create a GKE kubernetes cluster
+  * A github account
+  * A docker account
+
+
 ![MNIST](notebooks/mnist.png "MNIST Digits")
 
 
@@ -118,8 +125,10 @@ To dockerize our model training and run it we create:
 
 You can launch this workflow with the following:
 
+**Change the github-user and docker-user to those for your accounts.**
+
 ```
-argo submit workflows/training-tf-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
+argo submit workflows/training-tf-mnist-workflow.yaml -p github-user=SeldonIO -p docker-user=seldonio -p tfjob-version-hack=$RANDOM
 ```
 
 There is a hack to ensure a random TfJob due to this issue in [kubeflow](https://github.com/tensorflow/k8s/issues/322).
@@ -139,8 +148,11 @@ To wrap our model as a Docker container and launch we create:
     * Wraps the runtime model, builds a docker container for it and pushes it to your repo
     * Starts a seldon deployment that will run and expose your model
 
+
+**Change the github-user and docker-user to those for your accounts.**
+
 ```
-argo submit workflows/serving-tf-mnist-workflow.yaml
+argo submit workflows/serving-tf-mnist-workflow.yaml -p github-user=SeldonIO -p docker-user=seldonio
 ```
 
 
@@ -155,4 +167,14 @@ kubectl port-forward $(kubectl get pods -n default -l service=ambassador -o json
 ```
 
 You can test the service by following the example [jupyter notebook](notebooks/example.ipynb)
+
+
+# Next Steps
+
+There is a [second model for mnist using an sklearn random forest](models/sk_mnist/train/create_model.py) which can be found in [```models/sk_mnist```](models/sk_mnist/).
+
+ * You start an A-B test using the two models by using the deployment in [```k8s_serving/ab_test_sklearn_tensorflow.json```](k8s_serving/ab_test_sklearn_tensorflow.json)
+
+ 
+See Next Steps in [jupyter notebook](notebooks/example.ipynb)
 

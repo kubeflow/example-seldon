@@ -1,0 +1,93 @@
+{
+    "apiVersion": "machinelearning.seldon.io/v1alpha1",
+    "kind": "SeldonDeployment",
+    "metadata": {
+	"labels": {
+	    "app": "seldon"
+	},
+	"name": "mnist-classifier"
+    },
+    "spec": {
+	"annotations": {
+	    "project_name": "kubeflow-seldon",
+	    "deployment_version": "v1"
+	},
+	"name": "mnist-classifier",
+	"predictors": [
+	    {
+		"componentSpec": {
+		    "spec": {
+			"containers": [
+			    {
+                                "image": "seldonio/deepmnistclassifier_runtime:0.1",
+				"name": "tf-model",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/data",
+                                        "name": "persistent-storage"
+                                    }
+                                ]
+			    },
+			    {
+                                "image": "seldonio/skmnistclassifier_runtime:0.1",
+				"name": "sk-model",
+                                "volumeMounts": [
+                                    {
+                                        "mountPath": "/data",
+                                        "name": "persistent-storage"
+                                    }
+                                ]
+			    }
+			],
+                        "volumes": [
+                            {
+                                "name": "persistent-storage",
+				"volumeSource" : {
+                                    "persistentVolumeClaim": {
+					"claimName": "ml-data"
+                                    }
+				}
+                            }
+                        ]
+		    }
+		},
+		"name": "ab-test",
+		"replicas": 1,
+		"annotations": {
+		    "predictor_version": "v1"
+		},
+		"graph": {
+		    "name": "random-ab-test",
+		    "implementation":"RANDOM_ABTEST",
+		    "parameters": [
+			{
+			    "name":"ratioA",
+			    "value":"0.5",
+			    "type":"FLOAT"
+			}
+		    ],
+		    "children": [
+			{
+			    "name": "tf-model",
+			    "endpoint":{
+				"type":"REST"
+			    },
+			    "type":"MODEL"
+			},
+			{
+			    "name": "sk-model",
+			    "endpoint":{
+				"type":"REST"
+			    },
+			    "type":"MODEL"
+			}   
+		    ]
+		}
+	    }
+	]
+    }
+}
+		
+		
+
+ 
