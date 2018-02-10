@@ -83,8 +83,8 @@ cd k8s_tools && ks apply default
 
 # Data Science
 
- * [A simple model for MNIST](model/train/create_model.py)
- * [A runtime inference module](model/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
+ * [A simple TensorFlow model for MNIST](models/tf_mnist/train/create_model.py)
+ * [A runtime TensorFlow inference module](models/tf_mnist/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
 
 # Train Model
 
@@ -110,8 +110,8 @@ kubectl create my_docker_credentials.yaml
 
 To dockerize our model training and run it we create:
 
-  * [```model/train/build_and_push.sh```](model/train/build_and_push.sh) that will build an image for our Tensorflow training and push to our repo.
-  * An Argo workflow [```training-mnist-workflow.yaml```](training-mnist-workflow.yaml) is created which:
+  * [```models/tf_mnist/train/build_and_push.sh```](models/tf_mnist/train/build_and_push.sh) that will build an image for our Tensorflow training and push to our repo.
+  * An Argo workflow [```workflows/training-tf-mnist-workflow.yaml```](workflows/training-tf-mnist-workflow.yaml) is created which:
     * Clones the project from github
     * Runs the build and push script (using DockerInDocker)
     * Starts a kubeflow TfJob to train the model and save the results to the persistent volume
@@ -119,7 +119,7 @@ To dockerize our model training and run it we create:
 You can launch this workflow with the following:
 
 ```
-argo submit training-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
+argo submit workflows/training-tf-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
 ```
 
 There is a hack to ensure a random TfJob due to this issue in [kubeflow](https://github.com/tensorflow/k8s/issues/322).
@@ -131,13 +131,13 @@ When its finished, delete it, as the the current persistent volume is a GCS disk
 
 To wrap our model as a Docker container and launch we create:
 
- * [```model/runtime/wrap.sh```](model/runtime/wrap.sh) to wrap model using the seldon-core python wrapper.
- * An Argo workflow [```serving-mnist-workflow.yaml```] which:
+ * [```models/tf_mnist/runtime/wrap.sh```](models/tf_mnist/runtime/wrap.sh) to wrap model using the seldon-core python wrapper.
+ * An Argo workflow [```workflows/serving-tf-mnist-workflow.yaml```](workflows/serving-tf-mnist-workflow.yaml) which:
     * Wraps the runtime model, builds a docker container for it and pushes it to your repo
     * Starts a seldon deployment that will run and expose your model
 
 ```
-argo submit serving-mnist-workflow.yaml
+argo submit workflows/serving-tf-mnist-workflow.yaml
 ```
 
 

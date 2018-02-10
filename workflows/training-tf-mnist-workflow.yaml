@@ -36,7 +36,7 @@ spec:
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/kubeflow-seldon-example/model/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
+      args: ["cd /src/kubeflow-seldon-example/models/tf_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1

@@ -19,5 +19,4 @@ _*.yaml
 _*.json
 
 
-model/runtime/build/
-
+models/tf_mnist/runtime/build/
