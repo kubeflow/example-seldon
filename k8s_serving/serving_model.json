@@ -13,8 +13,6 @@
             "project_name": "MNIST Example"
         },
         "name": "mnist-classifier",
-        "oauth_key": "oauth-key",
-        "oauth_secret": "oauth-secret",
         "predictors": [
             {
                 "annotations": {
@@ -26,7 +24,7 @@
                             {
                                 "image": "seldonio/deepmnistclassifier_runtime:0.1",
                                 "imagePullPolicy": "Always",
-                                "name": "mnist-classifier",
+                                "name": "tf-model",
                                 "volumeMounts": [
                                     {
                                         "mountPath": "/data",
@@ -53,7 +51,7 @@
                     "endpoint": {
                         "type": "REST"
                     },
-                    "name": "mnist-classifier",
+                    "name": "tf-model",
                     "type": "MODEL"
                 },
                 "name": "mnist-classifier",

@@ -51,7 +51,7 @@
                         ]
 		    }
 		},
-		"name": "ab-test",
+		"name": "mnist-classifier",
 		"replicas": 1,
 		"annotations": {
 		    "predictor_version": "v1"

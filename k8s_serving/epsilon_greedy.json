@@ -55,7 +55,7 @@
                         ]
 		    }
 		},
-		"name": "multi-armed-bandit",
+		"name": "mnist-classifier",
 		"replicas": 1,
 		"annotations": {
 		    "predictor_version": "v1"
@@ -82,11 +82,11 @@
 		    ],
 		    "children": [
 			{
-			    "name": "tf-model",
+			    "name": "sk-model",
 			    "type": "MODEL"
 			},
 			{
-			    "name": "sk-model",
+			    "name": "tf-model",
 			    "type": "MODEL"
 			}
 		    ]
