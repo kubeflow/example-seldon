@@ -1,3 +1,12 @@
+# Example Argo Workflow to dockerize runtime model and deploy it for serving 
+
+Comments on the [serving-tf-mnist-workflow.yaml](serving-tf-mnist-workflow.yaml)
+
+
+ * Use global parameters to allow running on custom github forks of this repo and custom docker user.
+ * use global parameter for version so this could be part of a CI/CD pipeine on releases
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
@@ -12,17 +21,36 @@ spec:
       value: SeldonIO
     - name: docker-user
       value: seldonio
+```
+
+ * Use a secret containing the user's Docker credentials
+
+```yaml
   volumes:
   - name: my-secret-vol
     secret:
       secretName: docker-credentials     # name of an existing k8s secret
-  templates:
+```
+   
+ * Workflow has two parts
+   * Build and push runtime Docker image
+   * Launch runtime on Kubernets
+
+```yaml   
+templates:
   - name: workflow
     steps:
     - - name: build-push 
         template: build-and-push
     - - name: serve
         template: seldon
+```
+
+ * Pull repo from github
+ * Run wrap.sh to wrap the runtime model using Seldon python wrappers
+ * use the Docker-in-Docker sidecar provied by Argo
+
+```yaml
   - name: build-and-push
     inputs:
       artifacts:
@@ -56,7 +84,17 @@ spec:
       image: docker:17.10-dind          #Docker already provides an image for running a Docker daemon
       securityContext:
         privileged: true                #the Docker daemon can only run in a privileged container
+      # mirrorVolumeMounts will mount the same volumes specified in the main container
+      # to the sidecar (including artifacts), at the same mountPaths. This enables
+      # dind daemon to (partially) see the same filesystem as the main container in
+      # order to use features such as docker volume binding.
       mirrorVolumeMounts: true
+```
+
+ * Launch runtime model as SeldonDeployment
+ * Uses Persisten Volume Claim to load model parameters
+
+```yaml
   - name: seldon
     resource:                   #indicates that this is a resource template
       action: apply             #can be any kubectl action (e.g. create, delete, apply, patch)
@@ -103,5 +141,5 @@ spec:
                type: "MODEL"
              name: "mnist-classifier"
              replicas: 1
-
+```
 

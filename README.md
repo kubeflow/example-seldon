@@ -139,6 +139,8 @@ When its finished, delete it, as the the current persistent volume is a GCS disk
 argo delete --all
 ```
 
+ * See [here](workflows/training-tf-mnist-workflow.md) for detailed comments on workflow
+
 # Serve Model
 
 To wrap our model as a Docker container and launch we create:
@@ -155,6 +157,7 @@ To wrap our model as a Docker container and launch we create:
 argo submit workflows/serving-tf-mnist-workflow.yaml -p github-user=SeldonIO -p docker-user=seldonio
 ```
 
+ * See [here](workflows/serving-tf-mnist-workflow.md) for detailed comments on workflow
 
 # Get Predictions
 

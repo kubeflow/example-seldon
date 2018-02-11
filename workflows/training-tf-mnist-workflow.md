@@ -1,7 +1,16 @@
+# Example Argo Workflow to dockerize and Train Model
+
+Comments on the [training-tf-mnist-workflow.yaml](training-tf-mnist-workflow.yaml)
+
+ * use global parameter for version so this could be part of a CI/CD pipeine on releases
+ * Use global parameters to allow running on custom github forks of this repo and custom docker user.
+ * Has a parameter to allow a unique name to be given to the TfJob to work around kube-flow [bug](https://github.com/tensorflow/k8s/issues/322).
+
+```yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: seldon-deploy-
+  generateName: kubeflow-train-
 spec:
   entrypoint: workflow
   arguments:
@@ -12,17 +21,38 @@ spec:
       value: SeldonIO
     - name: docker-user
       value: seldonio
+    - name: tfjob-version-hack
+      value: 1
+```
+
+ * Use a secret containing the user's Docker credentials
+
+```yaml
   volumes:
   - name: my-secret-vol
     secret:
       secretName: docker-credentials     # name of an existing k8s secret
+```
+
+ * Workflow in 2 parts
+   * Build and push Docker image for training
+   * Run TfJob to do actual training
+
+```yaml
   templates:
   - name: workflow
     steps:
     - - name: build-push 
         template: build-and-push
-    - - name: serve
-        template: seldon
+    - - name: train
+        template: tfjob
+```
+
+ * Pull the repo from github
+ * Run the build_and_push.sh script with Docker credentials from secret
+ * use the Docker-in-Docker sidecar provied by Argo
+
+```yaml
   - name: build-and-push
     inputs:
       artifacts:
@@ -34,7 +64,7 @@ spec:
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/kubeflow-seldon-example/models/tf_mnist/runtime ; ./wrap.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
+      args: ["cd /src/kubeflow-seldon-example/models/tf_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
@@ -57,51 +87,48 @@ spec:
       securityContext:
         privileged: true                #the Docker daemon can only run in a privileged container
       mirrorVolumeMounts: true
-  - name: seldon
+```
+
+ * Launch a TFJob to do training
+ * Uses Persisten Volume Claim to save trained model parameters
+
+```yaml
+    - name: tfjob
     resource:                   #indicates that this is a resource template
-      action: apply             #can be any kubectl action (e.g. create, delete, apply, patch)
-      #successCondition: ? 
+      action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
+      successCondition: status.state == Succeeded
       manifest: |   #put your kubernetes spec here
-       apiVersion: "machinelearning.seldon.io/v1alpha1"
-       kind: "SeldonDeployment"
+       apiVersion: "kubeflow.org/v1alpha1"
+       kind: "TFJob"
        metadata: 
-         labels: 
-           app: "seldon"
-         name: "mnist-classifier"
+         name: mnist-train-{{workflow.parameters.tfjob-version-hack}}
+         namespace: "default"
+         ownerReferences:
+         - apiVersion: argoproj.io/v1alpha1
+           kind: Workflow
+           controller: true
+           name: kubeflow-train
+           uid: {{workflow.uid}}
        spec: 
-         annotations: 
-           deployment_version: "v1"
-           project_name: "MNIST Example"
-         name: "mnist-classifier"
-         predictors: 
+         replicaSpecs: 
            - 
-             annotations: 
-               predictor_version: "v1"
-             componentSpec: 
+             replicas: 1
+             template: 
                spec: 
                  containers: 
                    - 
-                     image: "seldonio/deepmnistclassifier_runtime:{{workflow.parameters.version}}"
-                     imagePullPolicy: "Always"
-                     name: "mnist-classifier"
+                     image: "seldonio/deepmnistclassifier_trainer:{{workflow.parameters.version}}"
+                     name: "tensorflow"
                      volumeMounts: 
                        - 
                          mountPath: "/data"
                          name: "persistent-storage"
-                 terminationGracePeriodSeconds: 1
+                 restartPolicy: "OnFailure"
                  volumes: 
                    - 
                      name: "persistent-storage"
-                     volumeSource: 
-                       persistentVolumeClaim: 
-                         claimName: "ml-data"
-             graph: 
-               children: []
-               endpoint: 
-                 type: "REST"
-               name: "mnist-classifier"
-               type: "MODEL"
-             name: "mnist-classifier"
-             replicas: 1
-
+                     persistentVolumeClaim: 
+                       claimName: "ml-data"
+             tfReplicaType: "MASTER"
+```
 
