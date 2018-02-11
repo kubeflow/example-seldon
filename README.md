@@ -87,6 +87,32 @@ cd k8s_tools && ks apply default
   * The steps to set up this ksonnet app are show [here](scripts/setup_k8s_tools.sh)
   * A [persistent volume claim](https://github.com/SeldonIO/seldon-core) is added to the components.
 
+## Optional Steps
+
+Optional: Port forward to Argo UI
+
+```
+kubectl port-forward $(kubectl get pods -n default -l app=argo-uio jsonpath='{.items[0].metadata.name}') -n default 8001:8001
+```
+
+Visit http://localhost:8001/timeline
+
+Optional: Install seldon-core prometheus and Grafana dashboard
+
+```bash
+kubectl -n kube-system create sa tiller
+kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+helm init --service-account tiller
+helm install seldon-core --name seldon-core --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts
+```
+
+Port forward dashboard to local port
+
+```
+kubectl port-forward $(kubectl get pods -n default -l app=grafanarom-server -o jsonpath='{.items[0].metadata.name}') -n default 3000:3000
+```
+
+Visit http://localhost:3000 and login using "admin" and the password you set above when launching with helm.
 
 # Data Science
 
