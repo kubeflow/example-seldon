@@ -116,7 +116,7 @@ helm install seldon-core-analytics --name seldon-core-analytics --set grafana_pr
 Port forward dashboard to local port
 
 ```
-kubectl port-forward $(kubectl get pods -n default -l app=grafanarom-server -o jsonpath='{.items[0].metadata.name}') -n default 3000:3000
+kubectl port-forward $(kubectl get pods -n default -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n default 3000:3000
 ```
 
 Visit http://localhost:3000 and login using "admin" and the password you set above when launching with helm.
