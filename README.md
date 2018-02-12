@@ -102,7 +102,7 @@ kubectl get all
 
 ## Optional Steps
 
-Optional: Port forward to Argo UI
+*Optional*: Port forward to Argo UI
 
 ```
 kubectl port-forward $(kubectl get pods -n default -l app=argo-ui -o jsonpath='{.items[0].metadata.name}') -n default 8001:8001
@@ -110,7 +110,7 @@ kubectl port-forward $(kubectl get pods -n default -l app=argo-ui -o jsonpath='{
 
 Visit http://localhost:8001/timeline
 
-Optional: Install seldon-core prometheus and Grafana dashboard
+*Optional*: Install seldon-core prometheus and Grafana dashboard
 
 ```bash
 kubectl -n kube-system create sa tiller
