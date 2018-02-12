@@ -21,7 +21,7 @@ In the follow we will:
 
  1. [Create a GKE Cluster](#create-a-kubernetes-cluster-on-gke) 
  1. [Setup Kubernetes with kubeflow and seldon-core](#install-tools)
- 1. [Clone this project](#clone-this-project-from-github)
+ 1. [Fork this project](#clone-this-project-from-github)
  1. [Install kubeflow and seldon-core on your cluster](#install-kubeflow-and-seldon-core-on-your-cluster)
  1. [Do the data science](#data-science)
  1. [Train the model](#train-model)
@@ -45,7 +45,9 @@ gcloud --project=${PROJECT} container clusters create \
 ```
 
 
-# Clone this Project from github
+# Fork or Clone this Project from github
+
+Fork https://github.com/SeldonIO/kubeflow-seldon-example if you wish to use your github account in the examples below otherwise you can use SeldonIO and just clone:
 
 ```bash
 git clone https://github.com/SeldonIO/kubeflow-seldon-example
@@ -171,10 +173,11 @@ To dockerize our model training and run it we create:
 
 You can launch this workflow with the following:
 
-**Change the github-user and docker-user to those for your accounts.**
+  * **Change the github-user if you forked the repo**
+  * **Change the docker-user to that of for your account.**
 
 ```
-GITHUB_USER=<MY_GITHUB_USER>
+GITHUB_USER=SeldonIO
 DOCKER_USER=<MY_DOCKER_USER>
 argo submit workflows/training-tf-mnist-workflow.yaml -p github-user=${GITHUB_USER} -p docker-user=${DOCKER_USER} -p tfjob-version-hack=$RANDOM
 ```
@@ -201,10 +204,11 @@ To wrap our model as a Docker container and launch we create:
     * Starts a seldon deployment that will run and expose your model
 
 
-**Change the github-user and docker-user to those for your accounts.**
+  * **Change the github-user if you forked the repo**
+  * **Change the docker-user to that of for your account.**
 
 ```
-GITHUB_USER=<MY_GITHUB_USER>
+GITHUB_USER=SeldonIO
 DOCKER_USER=<MY_DOCKER_USER>
 argo submit workflows/serving-tf-mnist-workflow.yaml -p github-user=${GITHUB_USER} -p docker-user=${DOCKER_USER}
 ```
