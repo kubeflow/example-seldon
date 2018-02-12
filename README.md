@@ -129,8 +129,16 @@ Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1
 
 # Data Science
 
- * [A simple TensorFlow model for MNIST](models/tf_mnist/train/create_model.py)
+In this demo we provide some example models for MNIST classification. Firstly, a Tensorflow model
+
+ * [A simple TensorFlow model for MNIST classification](models/tf_mnist/train/create_model.py)
  * [A runtime TensorFlow inference module](models/tf_mnist/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
+
+We also provide a simple scikit-learn random forest model which is used in the notebooks to illustrate A-B tests and multi-armed bandits.
+
+ * [A simple scikit-learn model for MNIST classification](models/sk_mnist/train/create_model.py)
+ * [A runtime scikit-learn inference module](models/sk_mnist/runtime/SkMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
+
 
 # Train Model
 
