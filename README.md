@@ -69,7 +69,7 @@ Install the [ksonnet binary](https://github.com/ksonnet/ksonnet/releases)
 
 You will need to setup a github personal token to stop rate-limiting see [here](https://github.com/ksonnet/ksonnet/blob/master/docs/troubleshooting.md)
 
-**If using RBAC create a clusterrolebinding for your GCP user, replacing ```<user-email>``` by the email of you are logged into GCP with**
+**If using RBAC create a clusterrolebinding for your GCP user, replacing ```<user-email>``` by the email you are logged into GCP with**
 
 ```
 kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --user=<user-email>
