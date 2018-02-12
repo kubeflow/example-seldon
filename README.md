@@ -99,7 +99,7 @@ kubectl get all
 Optional: Port forward to Argo UI
 
 ```
-kubectl port-forward $(kubectl get pods -n default -l app=argo-uio jsonpath='{.items[0].metadata.name}') -n default 8001:8001
+kubectl port-forward $(kubectl get pods -n default -l app=argo-ui -o jsonpath='{.items[0].metadata.name}') -n default 8001:8001
 ```
 
 Visit http://localhost:8001/timeline
