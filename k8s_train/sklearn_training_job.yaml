@@ -1,0 +1,24 @@
+apiVersion: "batch/v1"
+kind: "Job"
+metadata: 
+  name: "sk-train"
+  namespace: "default"
+spec: 
+  template: 
+    metadata: 
+      name: "sk-train"
+    spec: 
+      containers: 
+        - 
+          image: "seldonio/skmnistclassifier_trainer:0.1"
+          name: "sk-train"
+          volumeMounts: 
+            - 
+              mountPath: "/data"
+              name: "persistent-storage"
+      restartPolicy: "Never"
+      volumes: 
+        - 
+          name: "persistent-storage"
+          persistentVolumeClaim: 
+            claimName: "ml-data"
