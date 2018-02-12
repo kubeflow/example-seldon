@@ -30,6 +30,10 @@ In the follow we will:
 
 # Create a Kubernetes Cluster on GKE
 
+**For the current demo you will need to create a 1 node cluster** 
+
+This is because the default persistent volume claim on GCP uses a Google Persistent disk which is ReadWriteOnce. For a production setting you should use a file system which is ReadWriteMany.
+
 Example: 
 
 ```bash
@@ -37,11 +41,13 @@ PROJECT=mnist-classification
 ZONE=us-east1-d
 CLUSTER=kubeflow-seldon-ml
 
-gcloud --project=${PROJECT} container clusters create \
+gcloud beta container --project ${PROJECT} clusters create ${CLUSTER} \
        --zone=${ZONE} \
-       --machine-type=n1-standard-8 \
-       --cluster-version=1.8.4-gke.1 \
-       ${CLUSTER}
+       --cluster-version "1.9.2-gke.1" \
+       --machine-type "n1-standard-8" \
+       --image-type "COS" \
+       --disk-size "100" \
+       --num-nodes "1" 
 ```
 
 
