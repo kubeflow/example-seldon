@@ -69,7 +69,7 @@ Install the [ksonnet binary](https://github.com/ksonnet/ksonnet/releases)
 
 You will need to setup a github personal token to stop rate-limiting see [here](https://github.com/ksonnet/ksonnet/blob/master/docs/troubleshooting.md)
 
-**If using RBAC create a clusterrolebinding for your GCP user, replacing <user-email> by the email of you are logged into GCP with**
+**If using RBAC create a clusterrolebinding for your GCP user, replacing ```<user-email>``` by the email of you are logged into GCP with**
 
 ```
 kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --user=<user-email>
@@ -81,7 +81,7 @@ If using RBAC provide the default serviceaccount with cluster-admin to allow arg
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=default:default
 ```
 
-You need to create a ksonnet app and install all components needed by running from the root of the cloned project:
+You need to create a ksonnet app and install all components needed by running from the root of the cloned/forked project:
 
 ```bash
 ./scripts/setup_k8s_tools.sh
