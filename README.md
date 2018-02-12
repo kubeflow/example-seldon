@@ -160,7 +160,7 @@ $ curl -sSL -o /usr/local/bin/argo https://github.com/argoproj/argo/releases/dow
 $ chmod +x /usr/local/bin/argo
 ```
 
-We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in ```k8s_setup/docker-credentials-secret.yaml```
+We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in ```k8s_setup/docker-credentials-secret.yaml.tpl```
 
 On unix you can create base64 encoded versions of your credentials with the [base64](https://linux.die.net/man/1/base64) tool.
 
