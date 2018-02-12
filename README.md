@@ -88,6 +88,11 @@ cd k8s_tools
 ks apply default
 ```
 
+Wait for everything to come up, check with
+
+```
+kubectl get all
+```
 
 ## Optional Steps
 
@@ -105,7 +110,7 @@ Optional: Install seldon-core prometheus and Grafana dashboard
 kubectl -n kube-system create sa tiller
 kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
 helm init --service-account tiller
-helm install seldon-core --name seldon-core --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts
+helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts
 ```
 
 Port forward dashboard to local port
