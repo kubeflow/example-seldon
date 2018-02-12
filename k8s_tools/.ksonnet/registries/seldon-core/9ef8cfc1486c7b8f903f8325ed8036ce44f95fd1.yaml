@@ -1,9 +1,0 @@
-apiVersion: 0.1.0
-gitVersion:
-  commitSha: 9ef8cfc1486c7b8f903f8325ed8036ce44f95fd1
-  refSpec: master
-kind: ksonnet.io/registry
-libraries:
-  seldon-core:
-    path: seldon-core
-    version: master
