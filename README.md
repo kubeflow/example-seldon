@@ -228,6 +228,10 @@ kubectl port-forward $(kubectl get pods -n default -l service=ambassador -o json
 
 You can test the service by following the example [jupyter notebook](notebooks/example.ipynb)
 
+```
+cd notebooks
+jupyter notebook
+```
 
 # Next Steps
 
