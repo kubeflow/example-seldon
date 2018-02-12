@@ -45,20 +45,11 @@ gcloud --project=${PROJECT} container clusters create \
 ```
 
 
-
-# Install Tools
-
-  * Install [ksonnet binary](https://github.com/ksonnet/ksonnet/releases)
-    * Needed to install kubeflow and seldon-core on your cluster
-  * Install [Argo binary](https://github.com/argoproj/argo/blob/master/demo.md)
-    * Needed to run the CI/CD workflows
-
-
-
 # Clone this Project from github
 
 ```bash
 git clone https://github.com/SeldonIO/kubeflow-seldon-example
+cd kubeflow-seldon-example
 ```
 
 
@@ -66,7 +57,11 @@ git clone https://github.com/SeldonIO/kubeflow-seldon-example
 
 # Install kubeflow and seldon-core on your cluster
 
-If using RBAC create a clusterrolebinding for your GCP user
+Install the [ksonnet binary](https://github.com/ksonnet/ksonnet/releases)
+
+You will need to setup a github personal token to stop rate-limiting see [here](https://github.com/ksonnet/ksonnet/blob/master/docs/troubleshooting.md)
+
+**If using RBAC create a clusterrolebinding for your GCP user, replacing <user-email> by the email of you are logged into GCP with**
 
 ```
 kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --user=<user-email>
@@ -78,14 +73,19 @@ If using RBAC provide the default serviceaccount with cluster-admin to allow arg
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=default:default
 ```
 
-The ksonnet packages have already been setup so you can simply do:
+You need to create a ksonnet app and install all components needed by running from the root of the cloned project:
 
 ```bash
-cd k8s_tools && ks apply default
+./scripts/setup_k8s_tools.sh
 ```
 
-  * The steps to set up this ksonnet app are show [here](scripts/setup_k8s_tools.sh)
-  * A [persistent volume claim](https://github.com/SeldonIO/seldon-core) is added to the components.
+Then apply this app to your cluster
+
+```bash
+cd k8s_tools
+ks apply default
+```
+
 
 ## Optional Steps
 
@@ -121,7 +121,27 @@ Visit http://localhost:3000 and login using "admin" and the password you set abo
 
 # Train Model
 
+The training and serving steps are written as Argo jobs. You will need to install the Argo CLI.
+
+On Mac:
+```
+$ brew install argoproj/tap/argo
+```
+On Linux:
+```
+$ curl -sSL -o /usr/local/bin/argo https://github.com/argoproj/argo/releases/download/v2.0.0/argo-linux-amd64
+$ chmod +x /usr/local/bin/argo
+```
+
 We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in ```k8s_setup/docker-credentials-secret.yaml```
+
+On unix you can create base64 encoded versions of your credentials with the base64 tool:
+
+```
+echo "my-secret" | base64
+```
+
+Enter the data into a manifest as below:
 
 ```yaml
 apiVersion: v1
@@ -138,7 +158,7 @@ type: Opaque
 Apply the secret:
 
 ```bash
-kubectl create my_docker_credentials.yaml
+kubectl create -f my_docker_credentials.yaml
 ```
 
 To dockerize our model training and run it we create:
@@ -154,10 +174,14 @@ You can launch this workflow with the following:
 **Change the github-user and docker-user to those for your accounts.**
 
 ```
-argo submit workflows/training-tf-mnist-workflow.yaml -p github-user=SeldonIO -p docker-user=seldonio -p tfjob-version-hack=$RANDOM
+GITHUB_USER=<MY_GITHUB_USER>
+DOCKER_USER=<MY_DOCKER_USER>
+argo submit workflows/training-tf-mnist-workflow.yaml -p github-user=${GITHUB_USER} -p docker-user=${DOCKER_USER} -p tfjob-version-hack=$RANDOM
 ```
 
 There is a hack to ensure a random TfJob due to this issue in [kubeflow](https://github.com/tensorflow/k8s/issues/322).
+
+To check on your Argo jobs use ```argo list``` and ```argo get``` or the Argo UI discussed above.
 
 When its finished, delete it, as the the current persistent volume is a GCS disk with ReadOnlyOnce so we need to free the persistent volume claim.
 
@@ -180,7 +204,9 @@ To wrap our model as a Docker container and launch we create:
 **Change the github-user and docker-user to those for your accounts.**
 
 ```
-argo submit workflows/serving-tf-mnist-workflow.yaml -p github-user=SeldonIO -p docker-user=seldonio
+GITHUB_USER=<MY_GITHUB_USER>
+DOCKER_USER=<MY_DOCKER_USER>
+argo submit workflows/serving-tf-mnist-workflow.yaml -p github-user=${GITHUB_USER} -p docker-user=${DOCKER_USER}
 ```
 
  * See [here](workflows/serving-tf-mnist-workflow.md) for detailed comments on workflow
