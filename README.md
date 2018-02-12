@@ -119,7 +119,7 @@ Port forward dashboard to local port
 kubectl port-forward $(kubectl get pods -n default -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n default 3000:3000
 ```
 
-Visit http://localhost:3000 and login using "admin" and the password you set above when launching with helm.
+Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1 and login using "admin" and the password you set above when launching with helm.
 
 # Data Science
 
