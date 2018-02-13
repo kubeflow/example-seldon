@@ -87,7 +87,7 @@ If using RBAC provide the default serviceaccount with cluster-admin to allow arg
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=default:default
 ```
 
-You need to create a ksonnet app and install all components needed by running from the root of the cloned/forked project:
+You need to create a ksonnet app and install all components needed by running from the root of the cloned/forked project the following [script](scripts/setup_k8s_tools.sh):
 
 ```bash
 ./scripts/setup_k8s_tools.sh
