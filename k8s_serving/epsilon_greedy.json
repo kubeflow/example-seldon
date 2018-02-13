@@ -83,11 +83,17 @@
 		    "children": [
 			{
 			    "name": "sk-model",
-			    "type": "MODEL"
+			    "type": "MODEL",
+			    "endpoint":{
+				"type":"REST"
+			    }
 			},
 			{
 			    "name": "tf-model",
-			    "type": "MODEL"
+			    "type": "MODEL",
+			    "endpoint":{
+				"type":"REST"
+			    }
 			}
 		    ]
 		}

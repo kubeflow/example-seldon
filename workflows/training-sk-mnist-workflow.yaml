@@ -60,7 +60,7 @@ spec:
   - name: tfjob
     resource:                   #indicates that this is a resource template
       action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
-      successCondition: status.state == Succeeded
+      successCondition: status.succeeded == 1
       manifest: |   #put your kubernetes spec here
        apiVersion: "batch/v1"
        kind: "Job"
