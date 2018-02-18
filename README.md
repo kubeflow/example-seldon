@@ -75,15 +75,10 @@ Add your token to your .profile.
 export GITHUB_TOKEN=<token>
 ```
 
-**If using RBAC create a clusterrolebinding for your GCP user, replacing ```<user-email>``` by the email you are logged into GCP with**
+If using RBAC create a clusterrolebinding for your GCP user and for Argo which uses the default service account:
 
 ```
-kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin --user=<user-email>
-```
-
-If using RBAC provide the default serviceaccount with cluster-admin to allow argo to launch manifest. TODO: could be made more restrictive.
-
-```bash
+kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=default:default
 ```
 
