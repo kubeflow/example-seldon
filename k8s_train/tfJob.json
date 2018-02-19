@@ -1,6 +1,6 @@
 {
-    "apiVersion": "tensorflow.org/v1alpha1",
-    "kind": "TfJob",
+    "apiVersion": "kubeflow.org/v1alpha1",
+    "kind": "TFJob",
     "metadata": {
         "name": "mnist-train",
         "namespace": "default"
