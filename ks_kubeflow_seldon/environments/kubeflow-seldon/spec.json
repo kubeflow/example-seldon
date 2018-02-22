@@ -1,0 +1,4 @@
+{
+  "server": "https://35.205.109.153",
+  "namespace": "kubeflow-seldon"
+}
