@@ -31,14 +31,14 @@ spec:
     inputs:
       artifacts:
       - name: argo-source
-        path: /src/kubeflow-seldon-example
+        path: /src/example-seldon
         git:
           repo: https://github.com/{{workflow.parameters.github-user}}/example-seldon.git
           revision: "{{workflow.parameters.github-revision}}"          
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/kubeflow-seldon-example/models/sk_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}} {{workflow.parameters.push-image}}"]
+      args: ["cd /src/example-seldon/models/sk_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}} {{workflow.parameters.push-image}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
