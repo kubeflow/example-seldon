@@ -3,7 +3,6 @@
     "apiVersion": "v1",
     "metadata": {
         "name": "ml-data",
-        "namespace": "kubeflow-seldon"
     },
     "spec": {
         "accessModes": [
