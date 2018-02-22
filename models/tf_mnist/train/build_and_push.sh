@@ -1,3 +1,5 @@
+#!/bin/bash
+
 VERSION=$1
 REPO=$2
 PUSH=$3
@@ -10,7 +12,8 @@ done;
 
 docker build --force-rm=true -t ${REPO}/${IMAGE}:${VERSION} . 
 docker images 
-if [$PUSH = "true"] then
+if [$PUSH = "true"]
+then
    echo "Pushing image to ${REPO}/${IMAGE}:${VERSION}"
    echo $DOCKER_PASSWORD | docker login --username=$DOCKER_USERNAME --password-stdin 
    docker push ${REPO}/${IMAGE}:${VERSION}
