@@ -3,7 +3,7 @@
     "kind": "TFJob",
     "metadata": {
         "name": "mnist-train",
-        "namespace": "default"
+        "namespace": "kubeflow-seldon"
     },
     "spec": {
         "replicaSpecs": [

@@ -61,8 +61,6 @@ cd kubeflow-seldon-example
 ```
 
 
-
-
 # Install kubeflow and seldon-core on your cluster
 
 Install the [ksonnet binary](https://github.com/ksonnet/ksonnet/releases)
@@ -79,34 +77,44 @@ If using RBAC create a clusterrolebinding for your GCP user and for Argo which u
 
 ```
 kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
-kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=default:default
+kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow-seldon:default
 ```
 
-You need to create a ksonnet app and install all components needed by running from the root of the cloned/forked project the following [script](scripts/setup_k8s_tools.sh):
+There is a pre-packaged ksonnet app that will install kubeflow and seldon-core onto your cluster. First, create a namespace kubeflow-seldon
 
 ```bash
-./scripts/setup_k8s_tools.sh
+kubectl create namespace kubeflow-seldon
 ```
 
-Then apply this app to your cluster
+Next, go into the ksonnet app folder, and remove the default environment and add one for your running cluster.
 
 ```bash
-cd k8s_tools
-ks apply default
+cd ks_kubeflow_seldon
+ks env rm default
+ks env add kubeflow-seldon --namespace kubeflow-seldon
+```
+
+You should now be able to install everything onto your cluster, run:
+
+```bash
+ks apply kubeflow-seldon
 ```
 
 Wait for everything to come up, check with
 
 ```
-kubectl get all
+kubectl get all --namespace kubeflow-seldon
 ```
+
+If you want to see how the ksonnet app is set up, and thus how you would use it to install kubeflow and seldon-core from scratch you can see the steps in scripts/setup_ksonnet_kubeflow_seldon.sh
+
 
 ## Optional Steps
 
 *Optional*: Port forward to Argo UI
 
 ```
-kubectl port-forward $(kubectl get pods -n default -l app=argo-ui -o jsonpath='{.items[0].metadata.name}') -n default 8001:8001
+kubectl port-forward $(kubectl get pods -n kubeflow-seldon -l app=argo-ui -o jsonpath='{.items[0].metadata.name}') -n kubeflow-seldon 8001:8001
 ```
 
 Visit http://localhost:8001/timeline
@@ -117,13 +125,13 @@ Visit http://localhost:8001/timeline
 kubectl -n kube-system create sa tiller
 kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
 helm init --service-account tiller
-helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts
+helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts --namespace kubeflow-seldon
 ```
 
 Port forward dashboard to local port
 
 ```
-kubectl port-forward $(kubectl get pods -n default -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n default 3000:3000
+kubectl port-forward $(kubectl get pods -n kubeflow-seldon -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n kubeflow-seldon 3000:3000
 ```
 
 Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1 and login using "admin" and the password you set above when launching with helm.
@@ -155,60 +163,18 @@ $ curl -sSL -o /usr/local/bin/argo https://github.com/argoproj/argo/releases/dow
 $ chmod +x /usr/local/bin/argo
 ```
 
-We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in ```k8s_setup/docker-credentials-secret.yaml.tpl```
-
-On unix you can create base64 encoded versions of your credentials with the [base64](https://linux.die.net/man/1/base64) tool.
-
-Enter the data into a manifest as below:
-
-```yaml
-apiVersion: v1
-data:
-  password: <base 64 password>
-  username: <base 64 username>
-kind: Secret
-metadata:
-  name: docker-credentials
-  namespace: default
-type: Opaque
-```
-
-Apply the secret:
+Tp train the model run the Argo workflow
 
 ```bash
-kubectl create -f my_docker_credentials.yaml
+argo submit workflows/training-tf-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
 ```
 
-To dockerize our model training and run it we create:
+To understand the workflow in detail and run it with optional parameters to build and push to your own repo see [here](workflows/training-tf-mnist-workflow.md).
 
-  * [```models/tf_mnist/train/build_and_push.sh```](models/tf_mnist/train/build_and_push.sh) that will build an image for our Tensorflow training and push to our repo.
-  * An Argo workflow [```workflows/training-tf-mnist-workflow.yaml```](workflows/training-tf-mnist-workflow.yaml) is created which:
-    * Clones the project from github
-    * Runs the build and push script (using DockerInDocker)
-    * Starts a kubeflow TfJob to train the model and save the results to the persistent volume
-
-You can launch this workflow with the following:
-
-  * **Change the github-user if you forked the repo**
-  * **Change the docker-user to that of for your account.**
-
-```
-GITHUB_USER=SeldonIO
-DOCKER_USER=<MY_DOCKER_USER>
-argo submit workflows/training-tf-mnist-workflow.yaml -p github-user=${GITHUB_USER} -p docker-user=${DOCKER_USER} -p tfjob-version-hack=$RANDOM
-```
-
-There is a hack to ensure a random TfJob due to this issue in [kubeflow](https://github.com/tensorflow/k8s/issues/322).
 
 To check on your Argo jobs use ```argo list``` and ```argo get``` or the Argo UI discussed above.
 
-When its finished, delete it, as the the current persistent volume is a GCS disk with ReadOnlyOnce so we need to free the persistent volume claim.
 
-```
-argo delete --all
-```
-
- * See [here](workflows/training-tf-mnist-workflow.md) for detailed comments on workflow
 
 # Serve Model
 
@@ -238,7 +204,7 @@ The cluster is using [Ambassador](https://www.getambassador.io/) so your model w
 To expose the ambassador reverse proxy to a local port do
 
 ```
-kubectl port-forward $(kubectl get pods -n default -l service=ambassador -o jsonpath='{.items[0].metadata.name}') -n default 8002:80
+kubectl port-forward $(kubectl get pods -n kubeflow-seldon -l service=ambassador -o jsonpath='{.items[0].metadata.name}') -n kubeflow-seldon 8002:80
 ```
 
 You can test the service by following the example [jupyter notebook](notebooks/example.ipynb)
