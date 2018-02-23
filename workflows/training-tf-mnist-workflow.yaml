@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: kubeflow-train-
+  generateName: kubeflow-tf-train-
 spec:
   entrypoint: workflow
   arguments:
@@ -9,11 +9,15 @@ spec:
     - name: version
       value: 0.1
     - name: github-user
-      value: SeldonIO
+      value: kubeflow
+    - name: github-revision
+      value: master
     - name: docker-user
       value: seldonio
     - name: tfjob-version-hack
       value: 1
+    - name: build-push-image
+      value: false
   volumes:
   - name: my-secret-vol
     secret:
@@ -23,20 +27,21 @@ spec:
     steps:
     - - name: build-push 
         template: build-and-push
+        when: "{{workflow.parameters.build-push-image}} == true"
     - - name: train
         template: tfjob
   - name: build-and-push
     inputs:
       artifacts:
       - name: argo-source
-        path: /src/kubeflow-seldon-example
+        path: /src/example-seldon
         git:
-          repo: https://github.com/{{workflow.parameters.github-user}}/kubeflow-seldon-example.git
-          revision: "master"
+          repo: https://github.com/{{workflow.parameters.github-user}}/example-seldon.git
+          revision: "{{workflow.parameters.github-revision}}"
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/kubeflow-seldon-example/models/tf_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
+      args: ["cd /src/example-seldon/models/tf_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
@@ -68,7 +73,6 @@ spec:
        kind: "TFJob"
        metadata: 
          name: mnist-train-{{workflow.parameters.tfjob-version-hack}}
-         namespace: "default"
          ownerReferences:
          - apiVersion: argoproj.io/v1alpha1
            kind: Workflow
@@ -94,6 +98,6 @@ spec:
                    - 
                      name: "persistent-storage"
                      persistentVolumeClaim: 
-                       claimName: "ml-data"
+                       claimName: "nfs-1"
              tfReplicaType: "MASTER"
 

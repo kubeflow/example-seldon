@@ -48,7 +48,7 @@
                                 "name": "persistent-storage",
 				"volumeSource" : {
                                     "persistentVolumeClaim": {
-					"claimName": "ml-data"
+					"claimName": "nfs-1"
                                     }
 				}
                             }
