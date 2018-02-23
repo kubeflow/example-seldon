@@ -94,5 +94,5 @@ spec:
                - 
                  name: "persistent-storage"
                  persistentVolumeClaim: 
-                   claimName: "ml-data"
+                   claimName: "nfs-1"
 

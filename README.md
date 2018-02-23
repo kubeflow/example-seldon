@@ -16,8 +16,14 @@ In the follow we will:
  1. [Serve the model](#serve-model)
  1. [Get predictions](#get-predictions)
 
-**We assume you have a running kubernetes cluster with [kubeflow](https://github.com/kubeflow/kubeflow) installed along with seldon-core.** If you wish to run a preconfigured kubeflow and seldon that is packaged as part of this project see details [here](setup.md)
+# Prerequisites
 
+Either :
+
+ 1. Follow the [kubeflow](https://github.com/kubeflow/kubeflow) docs to 
+    1. Create a [persistent disk for NFS](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#advanced-customization). Call it nfs-1. 
+    1. Install kubeflow, NFS, Argo and Seldon-core onto your cluster.
+ 1. Use a preconfigured [ksonnet app in this project](setup.md).
 
 # Data Science
 
@@ -34,19 +40,7 @@ We also provide a simple scikit-learn random forest model which is used in the n
 
 # Train Model
 
-The training and serving steps are written as Argo jobs. You will need to install the Argo CLI.
-
-On Mac:
-```
-$ brew install argoproj/tap/argo
-```
-On Linux:
-```
-$ curl -sSL -o /usr/local/bin/argo https://github.com/argoproj/argo/releases/download/v2.0.0/argo-linux-amd64
-$ chmod +x /usr/local/bin/argo
-```
-
-Tp train the model run the Argo workflow
+The training and serving steps are written as [Argo](https://github.com/argoproj/argo) jobs. 
 
 ```bash
 argo submit workflows/training-tf-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
@@ -63,19 +57,8 @@ To check on your Argo jobs use ```argo list``` and ```argo get``` or the Argo UI
 
 To wrap our model as a Docker container and launch we create:
 
- * [```models/tf_mnist/runtime/wrap.sh```](models/tf_mnist/runtime/wrap.sh) to wrap model using the seldon-core python wrapper.
- * An Argo workflow [```workflows/serving-tf-mnist-workflow.yaml```](workflows/serving-tf-mnist-workflow.yaml) which:
-    * Wraps the runtime model, builds a docker container for it and pushes it to your repo
-    * Starts a seldon deployment that will run and expose your model
-
-
-  * **Change the github-user if you forked the repo**
-  * **Change the docker-user to that of for your account.**
-
 ```
-GITHUB_USER=SeldonIO
-DOCKER_USER=<MY_DOCKER_USER>
-argo submit workflows/serving-tf-mnist-workflow.yaml -p github-user=${GITHUB_USER} -p docker-user=${DOCKER_USER}
+argo submit workflows/serving-tf-mnist-workflow.yaml
 ```
 
  * See [here](workflows/serving-tf-mnist-workflow.md) for detailed comments on workflow

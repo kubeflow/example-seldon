@@ -8,7 +8,7 @@
     // Each object below should correspond to a component in the components/ directory
     "kubeflow-core": {
       cloud: "null",
-      disks: "null",
+      disks: "nfs-1",
       jupyterHubAuthenticator: "null",
       jupyterHubServiceType: "ClusterIP",
       name: "kubeflow-core",

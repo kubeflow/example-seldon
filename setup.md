@@ -1,10 +1,8 @@
 # Setup kubewflow and seldon-core
 
-## Create a Kubernetes Cluster on GKE
+## Create a Kubernetes Cluster and persistent Disk on GKE
 
-**For the current demo you will need to create a 1 node cluster** 
-
-This is because the default persistent volume claim on GCP uses a Google Persistent disk which is ReadWriteOnce. For a production setting you should use a file system which is ReadWriteMany.
+The persistent disk needs to be called nfs-1.
 
 Example: 
 
@@ -19,10 +17,11 @@ gcloud beta container --project ${PROJECT} clusters create ${CLUSTER} \
        --machine-type "n1-standard-8" \
        --image-type "COS" \
        --disk-size "100" \
-       --num-nodes "1" 
+       --num-nodes "3" 
+
+gcloud compute disks create  --zone=${ZONE} nfs-1 --description="PD to back NFS storage on GKE." --size=1TB
+
 ```
-
-
 
 
 ## Install kubeflow and seldon-core on your cluster
