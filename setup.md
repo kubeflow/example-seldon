@@ -49,11 +49,10 @@ There is a pre-packaged ksonnet app that will install kubeflow and seldon-core o
 kubectl create namespace kubeflow-seldon
 ```
 
-Next, go into the ksonnet app folder, and remove the default environment and add one for your running cluster.
+Next, go into the ksonnet app folder, and add your enviroment with the namespace you created.
 
 ```bash
 cd ks_kubeflow_seldon
-ks env rm default
 ks env add kubeflow-seldon --namespace kubeflow-seldon
 ```
 
