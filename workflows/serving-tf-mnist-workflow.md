@@ -22,8 +22,8 @@ To serve our runtime model we create:
    * The github revision to use for cloning the repo (can be a branch name)
  * docker-user
    * The Docker user to use when pushing an image to DockerHub
- * push-image
-   * Whether to push the image to an external repo on DockerHub (true/false)
+ * build-push-image
+   * Whether to build and push the image to an external repo on DockerHub (true/false)
 
 
 

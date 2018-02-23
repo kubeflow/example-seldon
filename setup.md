@@ -19,7 +19,7 @@ gcloud beta container --project ${PROJECT} clusters create ${CLUSTER} \
        --disk-size "100" \
        --num-nodes "3" 
 
-gcloud compute disks create  --zone=${ZONE} nfs-1 --description="PD to back NFS storage on GKE." --size=1TB
+gcloud compute disks create --project=${PROJECT} --zone=${ZONE} nfs-1 --description="PD to back NFS storage on GKE." --size=1TB
 
 ```
 
@@ -36,6 +36,13 @@ Add your token to your .profile.
 export GITHUB_TOKEN=<token>
 ```
 
+There is a pre-packaged ksonnet app that will install kubeflow and seldon-core onto your cluster in the namespace kubeflow-seldon. First, create a namespace kubeflow-seldon
+
+```bash
+kubectl create namespace kubeflow-seldon
+```
+
+
 If using RBAC create a clusterrolebinding for your GCP user and for Argo which uses the default service account:
 
 ```
@@ -43,11 +50,6 @@ kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow-seldon:default
 ```
 
-There is a pre-packaged ksonnet app that will install kubeflow and seldon-core onto your cluster in the namespace kubeflow-seldon. First, create a namespace kubeflow-seldon
-
-```bash
-kubectl create namespace kubeflow-seldon
-```
 
 Next, go into the ksonnet app folder, and add your enviroment with the namespace you created.
 
@@ -68,7 +70,11 @@ Wait for everything to come up, check with
 kubectl get all --namespace kubeflow-seldon
 ```
 
-If you want to see how the ksonnet app is set up, and thus how you would use it to install kubeflow and seldon-core from scratch you can see the steps in scripts/setup_ksonnet_kubeflow_seldon.sh
+Update your kubectl to use the namespace by default
+
+```bash
+kubectl config set-context $(kubectl config current-context) --namespace=kubeflow-seldon
+```
 
 
 ### Optional Steps

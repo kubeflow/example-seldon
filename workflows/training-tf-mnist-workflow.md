@@ -25,8 +25,8 @@ To dockerize our model training and run it we create:
    * The Docker user to use when pushing an image to DockerHub
  * tfjob-version-hack
    * A temporary random integer for the tfjob ID
- * push-image
-   * Whether to push the image to an external repo on DockerHub (true/false)
+ * build-push-image
+   * Whether to build and push the image to an external repo on DockerHub (true/false)
 
 ## Setup For Pushing Images
 

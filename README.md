@@ -23,14 +23,16 @@ Either :
  1. Follow the [kubeflow](https://github.com/kubeflow/kubeflow) docs to 
     1. Create a [persistent disk for NFS](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#advanced-customization). Call it nfs-1. 
     1. Install kubeflow, NFS, Argo and Seldon-core onto your cluster.
- 1. Use a preconfigured [ksonnet app in this project](setup.md).
+ 1. [Use a preconfigured ksonnet app in this project](setup.md).
 
 # Data Science
 
 In this demo we provide some example models for MNIST classification. Firstly, a Tensorflow model
 
  * [A simple TensorFlow model for MNIST classification](models/tf_mnist/train/create_model.py)
+ * [A script to build and optionaly push to DockerHub a Docker image for the training code](models/tf_mnist/train/build_and_push.sh)
  * [A runtime TensorFlow inference module](models/tf_mnist/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
+ * [A script to build and optionally push to DockerHub a Docker image for the run time predictions](models/tf_mnist/runtime/wrap.sh)
 
 We also provide a simple scikit-learn random forest model which is used in the notebooks to illustrate A-B tests and multi-armed bandits.
 

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: kubeflow-train-
+  generateName: kubeflow-tf-train-
 spec:
   entrypoint: workflow
   arguments:
@@ -16,7 +16,7 @@ spec:
       value: seldonio
     - name: tfjob-version-hack
       value: 1
-    - name: push-image
+    - name: build-push-image
       value: false
   volumes:
   - name: my-secret-vol
@@ -27,6 +27,7 @@ spec:
     steps:
     - - name: build-push 
         template: build-and-push
+        when: "{{workflow.parameters.build-push-image}} == true"
     - - name: train
         template: tfjob
   - name: build-and-push
@@ -40,7 +41,7 @@ spec:
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/example-seldon/models/tf_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}} {{workflow.parameters.push-image}}"]
+      args: ["cd /src/example-seldon/models/tf_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
