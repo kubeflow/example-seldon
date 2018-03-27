@@ -24,7 +24,7 @@ gcloud compute disks create --project=${PROJECT} --zone=${ZONE} nfs-1 --descript
 ```
 
 
-## Install kubeflow and seldon-core on your cluster
+## Install kubeflow and seldon-core onto your cluster
 
 Install the [ksonnet binary](https://github.com/ksonnet/ksonnet/releases)
 
@@ -36,12 +36,11 @@ Add your token to your .profile.
 export GITHUB_TOKEN=<token>
 ```
 
-There is a pre-packaged ksonnet app that will install kubeflow and seldon-core onto your cluster in the namespace kubeflow-seldon. First, create a namespace kubeflow-seldon
+Create a namespace kubeflow-seldon
 
 ```bash
 kubectl create namespace kubeflow-seldon
 ```
-
 
 If using RBAC create a clusterrolebinding for your GCP user and for Argo which uses the default service account:
 
@@ -50,34 +49,62 @@ kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow-seldon:default
 ```
 
-
-Next, go into the ksonnet app folder, and add your enviroment with the namespace you created.
+Create a ksonnet app in a location of your choice and enter the created folder:
 
 ```bash
+ks init ks_kubeflow_seldon --api-spec=version:v1.8.0
 cd ks_kubeflow_seldon
-ks env add kubeflow-seldon --namespace kubeflow-seldon
 ```
 
-You should now be able to install everything onto your cluster, run:
+Install kubeflow components:
+
+  * kubeflow-core
+  * Tensorflow Job (for training)
+  * Seldon-core (for deployment)
+  * Argo (for workflows)
 
 ```bash
-ks apply kubeflow-seldon
+ks registry add kubeflow github.com/kubeflow/kubeflow/tree/master/kubeflow 
+ks pkg install kubeflow/core 
+ks pkg install kubeflow/tf-job
+ks pkg install kubeflow/seldon
+ks pkg install kubeflow/argo
+ks generate core kubeflow-core --name=kubeflow-core --namespace kubeflow-seldon
+ks generate seldon seldon --namespace kubeflow-seldon
+ks prototype use io.ksonnet.pkg.argo argo --namespace kubeflow-seldon --name argo
 ```
 
-Wait for everything to come up, check with
+Setup the particular config settings. We set usage metrics to true : skip this step if you do not wish to contribute usage metrics. We also specify the name of the NFS volume we created.
 
-```
-kubectl get all --namespace kubeflow-seldon
+```bash
+ks param set kubeflow-core reportUsage true
+ks param set kubeflow-core usageId $(uuidgen)
+ks param set kubeflow-core disks nfs-1
 ```
 
-Update your kubectl to use the namespace by default
+Set up the environment for kubeflow
+
+```bash
+ks env add cloud
+ks param set kubeflow-core cloud gke --env=cloud
+ks env set cloud --namespace kubeflow-seldon
+```
+
+To create all the components run the following command
+
+```bash
+ks apply cloud
+```
+
+
+### Optional Steps
+
+*Optional*: Update your kubectl to use the namespace by default
 
 ```bash
 kubectl config set-context $(kubectl config current-context) --namespace=kubeflow-seldon
 ```
 
-
-### Optional Steps
 
 *Optional*: Port forward to Argo UI
 
