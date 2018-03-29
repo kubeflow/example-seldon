@@ -20,10 +20,10 @@ In the follow we will:
 
 Either :
 
- 1. Follow the [kubeflow](https://github.com/kubeflow/kubeflow) docs to 
+ 1. Follow the [kubeflow](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md) docs to 
     1. Create a [persistent disk for NFS](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#advanced-customization). Call it nfs-1. 
-    1. Install kubeflow, NFS, Argo and Seldon-core onto your cluster.
- 1. [Use a preconfigured ksonnet app in this project](setup.md).
+    1. Install kubeflow with an [NFS volume](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#advanced-customization), Argo and [seldon-core](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#serve-a-model-using-seldon) onto your cluster.
+ 1. [Follow a consolidated guide to do the steps in 1](setup.md).
 
 # Data Science
 
