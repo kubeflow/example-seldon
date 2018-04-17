@@ -16,6 +16,8 @@ spec:
       value: seldonio
     - name: build-push-image
       value: false
+    - name: deploy-model
+      value: false
   volumes:
   - name: my-secret-vol
     secret:
@@ -28,6 +30,7 @@ spec:
         when: "{{workflow.parameters.build-push-image}} == true"
     - - name: serve
         template: seldon
+        when: "{{workflow.parameters.deploy-model}} == true"	
   - name: build-and-push
     inputs:
       artifacts:
