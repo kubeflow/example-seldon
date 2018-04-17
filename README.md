@@ -1,22 +1,32 @@
-# End-To-End Train and Deploy Machine Learning Model on Kubernetes (on GKE)
+# Train and Deploy Machine Learning Models on Kubernetes with Kubeflow and Seldon-Core
+
+![MNIST](notebooks/mnist.png "MNIST Digits")
 
 Using:
 
  * [kubeflow](https://github.com/kubeflow/kubeflow)
  * [seldon-core](https://github.com/SeldonIO/seldon-core)
  
-The example will be the MNIST handwriiten digit classification task.
+The example will be the MNIST handwritten digit classification task. We will train 3 different models to solve this task:
 
-![MNIST](notebooks/mnist.png "MNIST Digits")
+ * A TensorFlow neural network model.
+ * A scikit-learn random forest model.
+ * An R least squares model.
+
+We will then show various rolling deployments
+
+ 1. Deploy the single Tensorflow model.
+ 2. Do a rolling update to an AB test of the Tensorflow model and the sklearn model.
+ 3. Do a rolling update to a Multi-armed Bandit over all 3 models to direct traffic in real time to the best model.
+
 
 In the follow we will:
 
- 1. [Do the data science](#data-science)
- 1. [Train the model](#train-model)
- 1. [Serve the model](#serve-model)
- 1. [Get predictions](#get-predictions)
+ 1. [Install kubeflow and seldon-core on a kubernetes cluster](#setup)
+ 1. [Train the models](#train-the-models)
+ 1. [Serve the models](#serve-the-models)
 
-# Prerequisites
+# Setup
 
 Either :
 
@@ -25,69 +35,45 @@ Either :
     1. Install kubeflow with an [NFS volume](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#advanced-customization), Argo and [seldon-core](https://github.com/kubeflow/kubeflow/blob/master/user_guide.md#serve-a-model-using-seldon) onto your cluster.
  1. [Follow a consolidated guide to do the steps in 1](setup.md).
 
-# Data Science
+# MNIST models
 
-In this demo we provide some example models for MNIST classification. Firstly, a Tensorflow model
+## Tensorflow Model
 
- * [A simple TensorFlow model for MNIST classification](models/tf_mnist/train/create_model.py)
- * [A script to build and optionaly push to DockerHub a Docker image for the training code](models/tf_mnist/train/build_and_push.sh)
- * [A runtime TensorFlow inference module](models/tf_mnist/runtime/DeepMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
- * [A script to build and optionally push to DockerHub a Docker image for the run time predictions](models/tf_mnist/runtime/wrap.sh)
+ * [Python training code](models/tf_mnist/train/create_model.py)
+ * [Python runtime prediction code](models/tf_mnist/runtime/DeepMnist.py)
+ * [Script to create wrap runtime prediction code to run under seldon-Core](models/tf_mnist/runtime/wrap.sh)
 
-We also provide a simple scikit-learn random forest model which is used in the notebooks to illustrate A-B tests and multi-armed bandits.
+## SKLearn Model
 
- * [A simple scikit-learn model for MNIST classification](models/sk_mnist/train/create_model.py)
- * [A runtime scikit-learn inference module](models/sk_mnist/runtime/SkMnist.py) that provides a predict method that can be wrapped by seldon-core for deployment.
+ * [Python training code](models/sk_mnist/train/create_model.py)
+ * [Python runtime prediction code](models/sk_mnist/runtime/SkMnist.py)
+ * [Script to create wrap runtime prediction code to run under seldon-Core](models/sk_mnist/runtime/wrap.sh)
+
+## R Model
+
+ * [R training code](models/r_mnist/train/train.R)
+ * [R runtime prediction code](models/r_mnist/runtime/mnist.R)
+ * [Script to create wrap runtime prediction code to run under seldon-Core](models/r_mnist/runtime/wrap.sh)
+
+# Train the Models
+
+ Follow the steps in [./notebooks/training.ipynb](./notebooks/training.ipynb) to:
+
+ * Run Argo Jobs for each model to:
+   * Creating training images and push to repo
+   * Run training
+   * Create runtime prediction images and push to repo
+   * Deploy individual runtime model
 
 
-# Train Model
+# Serve the Models
 
-The training and serving steps are written as [Argo](https://github.com/argoproj/argo) jobs. 
+Follow the steps in [./notebooks/serving.ipynb](./notebooks/serving.ipynb) to:
 
-```bash
-argo submit workflows/training-tf-mnist-workflow.yaml -p tfjob-version-hack=$RANDOM
-```
+ 1. Deploy the single Tensorflow model.
+ 2. Do a rolling update to an AB test of the Tensorflow model and the sklearn model.
+ 3. Do a rolling update to a Multi-armed Bandit over all 3 models to direct traffic in real time to the best model.
 
-To understand the workflow in detail and run it with optional parameters to build and push to your own repo see [here](workflows/training-tf-mnist-workflow.md).
+If you have [installed the Seldon-Core analytics](setup.md#grafana-dashboard) you can view them on the grafana dashboard:
 
-
-To check on your Argo jobs use ```argo list``` and ```argo get``` or the Argo UI discussed above.
-
-
-
-# Serve Model
-
-To wrap our model as a Docker container and launch we create:
-
-```
-argo submit workflows/serving-tf-mnist-workflow.yaml
-```
-
- * See [here](workflows/serving-tf-mnist-workflow.md) for detailed comments on workflow
-
-# Get Predictions
-
-The cluster is using [Ambassador](https://www.getambassador.io/) so your model will be exposed by REST and gRPC on the Ambassador reverse proxy.
-
-To expose the ambassador reverse proxy to a local port do
-
-```
-kubectl port-forward $(kubectl get pods -n kubeflow-seldon -l service=ambassador -o jsonpath='{.items[0].metadata.name}') -n kubeflow-seldon 8002:80
-```
-
-You can test the service by following the example [jupyter notebook](notebooks/example.ipynb)
-
-```
-cd notebooks
-jupyter notebook
-```
-
-# Next Steps
-
-There is a [second model for mnist using an sklearn random forest](models/sk_mnist/train/create_model.py) which can be found in [```models/sk_mnist```](models/sk_mnist/).
-
- * You start an A-B test using the two models by using the deployment in [```k8s_serving/ab_test_sklearn_tensorflow.json```](k8s_serving/ab_test_sklearn_tensorflow.json)
-
- 
-See Next Steps in [jupyter notebook](notebooks/example-seldon.ipynb)
-
+![Grafana](grafana.png "Grafana Dashboard")
