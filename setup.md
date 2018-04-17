@@ -114,6 +114,8 @@ kubectl port-forward $(kubectl get pods -n kubeflow-seldon -l app=argo-ui -o jso
 
 Visit http://localhost:8001/timeline
 
+### Grafana Dashboard
+
 *Optional*: Install seldon-core prometheus and Grafana dashboard
 
 ```bash

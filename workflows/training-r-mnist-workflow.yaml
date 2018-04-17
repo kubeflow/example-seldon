@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: seldon-tf-deploy-
+  generateName: kubeflow-r-train-
 spec:
   entrypoint: workflow
   arguments:
@@ -11,13 +11,11 @@ spec:
     - name: github-user
       value: kubeflow
     - name: github-revision
-      value: master
+      value: master      
     - name: docker-user
       value: seldonio
     - name: build-push-image
-      value: false
-    - name: deploy-model
-      value: false
+      value: false      
   volumes:
   - name: my-secret-vol
     secret:
@@ -28,9 +26,8 @@ spec:
     - - name: build-push 
         template: build-and-push
         when: "{{workflow.parameters.build-push-image}} == true"
-    - - name: serve
-        template: seldon
-        when: "{{workflow.parameters.deploy-model}} == true"	
+    - - name: train
+        template: tfjob
   - name: build-and-push
     inputs:
       artifacts:
@@ -38,11 +35,11 @@ spec:
         path: /src/example-seldon
         git:
           repo: https://github.com/{{workflow.parameters.github-user}}/example-seldon.git
-          revision: "{{workflow.parameters.github-revision}}"
+          revision: "{{workflow.parameters.github-revision}}"          
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/example-seldon/models/tf_mnist/runtime ; ./wrap.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
+      args: ["cd /src/example-seldon/models/r_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
@@ -65,51 +62,38 @@ spec:
       securityContext:
         privileged: true                #the Docker daemon can only run in a privileged container
       mirrorVolumeMounts: true
-  - name: seldon
+  - name: tfjob
     resource:                   #indicates that this is a resource template
-      action: apply             #can be any kubectl action (e.g. create, delete, apply, patch)
-      #successCondition: ? 
+      action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
+      successCondition: status.succeeded == 1
       manifest: |   #put your kubernetes spec here
-       apiVersion: "machinelearning.seldon.io/v1alpha1"
-       kind: "SeldonDeployment"
+       apiVersion: "batch/v1"
+       kind: "Job"
        metadata: 
-         labels: 
-           app: "seldon"
-         name: "mnist-classifier"
+         name: "r-train"
+         ownerReferences:
+         - apiVersion: argoproj.io/v1alpha1
+           kind: Workflow
+           controller: true
+           name: kubeflow-train
+           uid: {{workflow.uid}}
        spec: 
-         annotations: 
-           deployment_version: "v1"
-           project_name: "MNIST Example"
-         name: "mnist-classifier"
-         predictors: 
-           - 
-             annotations: 
-               predictor_version: "v1"
-             componentSpec: 
-               spec: 
-                 containers: 
+         template: 
+           metadata: 
+             name: "r-train"
+           spec: 
+             containers: 
+               - 
+                 image: "seldonio/rmnistclassifier_trainer:{{workflow.parameters.version}}"
+                 name: "r-train"
+                 volumeMounts: 
                    - 
-                     image: "seldonio/deepmnistclassifier_runtime:{{workflow.parameters.version}}"
-                     imagePullPolicy: "Always"
-                     name: "mnist-classifier"
-                     volumeMounts: 
-                       - 
-                         mountPath: "/data"
-                         name: "persistent-storage"
-                 terminationGracePeriodSeconds: 1
-                 volumes: 
-                   - 
+                     mountPath: "/data"
                      name: "persistent-storage"
-                     volumeSource: 
-                       persistentVolumeClaim: 
-                         claimName: "nfs-1"
-             graph: 
-               children: []
-               endpoint: 
-                 type: "REST"
-               name: "mnist-classifier"
-               type: "MODEL"
-             name: "mnist-classifier"
-             replicas: 1
-
+             restartPolicy: "Never"
+             volumes: 
+               - 
+                 name: "persistent-storage"
+                 persistentVolumeClaim: 
+                   claimName: "nfs-1"
 

@@ -9,6 +9,7 @@ RUN cd /tmp && \
 
 RUN mkdir training
 COPY ./create_model.py /training/create_model.py
+COPY ./train.sh /training/train.sh
 WORKDIR /training
 
-CMD ["python","-u","create_model.py"]
+CMD ["/training/train.sh"]

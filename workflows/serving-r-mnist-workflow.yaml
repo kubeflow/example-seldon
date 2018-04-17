@@ -4,7 +4,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: seldon-sk-deploy-
+  generateName: seldon-r-deploy-
 spec:
   entrypoint: workflow
   arguments:
@@ -33,7 +33,7 @@ spec:
         when: "{{workflow.parameters.build-push-image}} == true"
     - - name: serve
         template: seldon
-        when: "{{workflow.parameters.deploy-model}} == true"		
+        when: "{{workflow.parameters.deploy-model}} == true"			
   - name: build-and-push
     inputs:
       artifacts:
@@ -45,7 +45,7 @@ spec:
     container:
       image: docker:17.10
       command: [sh,-c]
-      args: ["cd /src/example-seldon/models/sk_mnist/runtime ; ./wrap.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
+      args: ["cd /src/example-seldon/models/r_mnist/runtime ; ./wrap.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
       env:
       - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
         value: 127.0.0.1
@@ -96,7 +96,7 @@ spec:
                spec: 
                  containers: 
                    - 
-                     image: "seldonio/skmnistclassifier_runtime:{{workflow.parameters.version}}"
+                     image: "seldonio/rmnistclassifier_runtime:{{workflow.parameters.version}}"
                      imagePullPolicy: "Always"
                      name: "mnist-classifier"
                      volumeMounts: 
