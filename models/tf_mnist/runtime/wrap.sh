@@ -3,17 +3,18 @@ REPO=$2
 
 IMAGE=deepmnistclassifier_runtime
 
+wget https://github.com/openshift/source-to-image/releases/download/v1.1.9a/source-to-image-v1.1.9a-40ad911d-linux-amd64.tar.gz
+tar -zxf source-to-image-v1.1.9a-40ad911d-linux-amd64.tar.gz
+
 until docker ps; 
 do sleep 3; 
 done; 
 
-docker run -v  ${PWD}:/my_model seldonio/core-python-wrapper:0.6 /my_model DeepMnist ${VERSION} ${REPO} --image-name=${IMAGE}
-cd ./build
-./build_image.sh
+./s2i build . seldonio/seldon-core-s2i-python2 ${REPO}/${IMAGE}:${VERSION}
 docker images 
 echo "Pushing image to ${REPO}/${IMAGE}:${VERSION}"
 echo $DOCKER_PASSWORD | docker login --username=$DOCKER_USERNAME --password-stdin 
-./push_image.sh
+docker push ${REPO}/${IMAGE}:${VERSION}
 
 
 
