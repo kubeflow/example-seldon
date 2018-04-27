@@ -6,6 +6,10 @@ IMAGE=skmnistclassifier_runtime
 echo "start"
 echo $DOCKER_HOST
 
+export DOCKER_HOST="tcp://127.0.0.1"
+
+echo $DOCKER_HOST
+
 apk add --update openssl
 
 wget https://github.com/openshift/source-to-image/releases/download/v1.1.9a/source-to-image-v1.1.9a-40ad911d-linux-amd64.tar.gz
