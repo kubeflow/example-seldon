@@ -6,7 +6,7 @@ IMAGE=skmnistclassifier_runtime
 echo "start"
 echo $DOCKER_HOST
 
-unset DOCKER_HOST
+export DOCKER_HOST="tcp://127.0.0.1:2376"
 
 echo $DOCKER_HOST
 
