@@ -84,7 +84,7 @@ spec:
            spec: 
              containers: 
                - 
-                 image: "seldonio/rmnistclassifier_trainer:{{workflow.parameters.version}}"
+                 image: "{{workflow.parameters.docker-user}}/rmnistclassifier_trainer:{{workflow.parameters.version}}"
                  name: "r-train"
                  volumeMounts: 
                    - 

@@ -89,7 +89,7 @@ spec:
                spec: 
                  containers: 
                    - 
-                     image: "seldonio/deepmnistclassifier_runtime:{{workflow.parameters.version}}"
+                     image: "{{workflow.parameters.docker-user}}/deepmnistclassifier_runtime:{{workflow.parameters.version}}"
                      imagePullPolicy: "Always"
                      name: "mnist-classifier"
                      volumeMounts: 

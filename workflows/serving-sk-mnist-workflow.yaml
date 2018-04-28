@@ -12,7 +12,7 @@ spec:
     - name: version
       value: 0.1
     - name: github-user
-      value: SeldonIO
+      value: kubeflow
     - name: github-revision
       value: master
     - name: docker-user
@@ -96,7 +96,7 @@ spec:
                spec: 
                  containers: 
                    - 
-                     image: "seldonio/skmnistclassifier_runtime:{{workflow.parameters.version}}"
+                     image: "{{workflow.parameters.docker-user}}/skmnistclassifier_runtime:{{workflow.parameters.version}}"
                      imagePullPolicy: "Always"
                      name: "mnist-classifier"
                      volumeMounts: 

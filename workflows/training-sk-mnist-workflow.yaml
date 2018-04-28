@@ -84,7 +84,7 @@ spec:
            spec: 
              containers: 
                - 
-                 image: "seldonio/skmnistclassifier_trainer:{{workflow.parameters.version}}"
+                 image: "{{workflow.parameters.docker-user}}/skmnistclassifier_trainer:{{workflow.parameters.version}}"
                  name: "sk-train"
                  volumeMounts: 
                    - 
