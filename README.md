@@ -65,6 +65,7 @@ Either :
    * Create runtime prediction images and push to repo
    * Deploy individual runtime model
 
+**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret using the template in [k8s_setup/docker-credentials-secret.yaml.tpl](k8s_setup/docker-credentials-secret.yaml.tpl).**
 
 # Serve the Models
 
