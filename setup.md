@@ -55,27 +55,18 @@ kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster
 kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow-seldon:default
 ```
 
-Create a ksonnet app in a location of your choice and enter the created folder:
+Install kubeflow - for details see [here](https://www.kubeflow.org/docs/about/user_guide)
 
-```bash
-ks init ks_kubeflow_seldon --api-spec=version:v1.8.0
-cd ks_kubeflow_seldon
+```
+export KUBEFLOW_VERSION=0.2.2
+export KUBEFLOW_KS_DIR=</path/to/store/your/ksonnet/application>
+export KUBEFLOW_DEPLOY=false
+curl https://raw.githubusercontent.com/kubeflow/kubeflow/v${KUBEFLOW_VERSION}/scripts/deploy.sh | bash
 ```
 
-Install kubeflow components:
+Install seldon and argo.
 
-  * kubeflow-core
-  * Tensorflow Job (for training)
-  * Seldon-core (for deployment)
-  * Argo (for workflows)
-
-```bash
-ks registry add kubeflow github.com/kubeflow/kubeflow/tree/master/kubeflow 
-ks pkg install kubeflow/core 
-ks pkg install kubeflow/tf-job
-ks pkg install kubeflow/seldon
-ks pkg install kubeflow/argo
-ks generate core kubeflow-core --name=kubeflow-core --namespace kubeflow-seldon
+```
 ks generate seldon seldon --namespace kubeflow-seldon
 ks prototype use io.ksonnet.pkg.argo argo --namespace kubeflow-seldon --name argo
 ```
@@ -88,20 +79,11 @@ ks param set kubeflow-core usageId $(uuidgen)
 ks param set kubeflow-core disks nfs-1
 ```
 
-Set up the environment for kubeflow
-
-```bash
-ks env add cloud
-ks param set kubeflow-core cloud gke --env=cloud
-ks env set cloud --namespace kubeflow-seldon
-```
-
 To create all the components run the following command
 
 ```bash
-ks apply cloud
+ks apply default
 ```
-
 
 ### Optional Steps
 
