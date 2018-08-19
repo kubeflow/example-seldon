@@ -26,13 +26,43 @@ In the follow we will:
  1. [Train the models](#train-the-models)
  1. [Serve the models](#serve-the-models)
 
+
+# Requirements
+
+ * Kubectl
+ * Ksonnet
+ * Argo
+
 # Setup
 
-Either :
+  * Give auth to your account for Argo
+  ```
+  kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
+  kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow:default
+  ```
+  * [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/)
 
- 1. Follow the [kubeflow user guide](https://www.kubeflow.org/docs/about/user_guide)
-    1. Install kubeflow with an [NFS volume](https://www.kubeflow.org/docs/about/user_guide/#persistent-disks) called nfs-1, Argo and [seldon-core](https://www.kubeflow.org/docs/about/user_guide/#serve-a-model-using-seldon) onto your cluster.
- 1. [Follow a consolidated guide to do the steps in 1](setup.md).
+This will create a ksonnet application in the folder you ran the kubeflow deploy script called ```<project-name>_ks_app```. Run the following commands from that folder:
+
+  * [Create an NFS disk named nfs-1](https://www.kubeflow.org/docs/guides/advanced/)
+  * Install Seldon and Argo
+  ```
+     ks generate seldon seldon
+     ks generate argo argo
+     ks apply default
+  ```
+  * Install seldon grafana dashboard
+  ```
+  kubectl -n kube-system create sa tiller
+  kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+  helm init --service-account tiller
+  helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts --namespace kubeflow
+  ```
+  * Port forward the dashboard when running
+  ```
+     kubectl port-forward $(kubectl get pods -n kubeflow -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n kubeflow 3000:3000
+  ```
+  * Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1 and login using "admin" and the password you set above when launching with helm.
 
 # MNIST models
 

@@ -67,9 +67,9 @@ spec:
   - name: tfjob
     resource:                   #indicates that this is a resource template
       action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
-      successCondition: status.state == Succeeded
+      successCondition: status.tfReplicaStatuses.Worker.succeeded == 1
       manifest: |   #put your kubernetes spec here
-       apiVersion: "kubeflow.org/v1alpha1"
+       apiVersion: "kubeflow.org/v1alpha2"
        kind: "TFJob"
        metadata: 
          name: mnist-train-{{workflow.parameters.tfjob-version-hack}}
@@ -80,8 +80,8 @@ spec:
            name: kubeflow-train
            uid: {{workflow.uid}}
        spec: 
-         replicaSpecs: 
-           - 
+         tfReplicaSpecs: 
+           Worker: 
              replicas: 1
              template: 
                spec: 

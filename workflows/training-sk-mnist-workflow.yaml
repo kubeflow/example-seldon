@@ -7,7 +7,7 @@ spec:
   arguments:
     parameters:
     - name: version
-      value: 0.1
+      value: 0.2
     - name: github-user
       value: kubeflow
     - name: github-revision
@@ -86,6 +86,7 @@ spec:
                - 
                  image: "{{workflow.parameters.docker-user}}/skmnistclassifier_trainer:{{workflow.parameters.version}}"
                  name: "sk-train"
+                 imagePullPolicy: Always
                  volumeMounts: 
                    - 
                      mountPath: "/data"
