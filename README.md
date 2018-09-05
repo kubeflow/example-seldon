@@ -40,11 +40,19 @@ In the follow we will:
   kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
   kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow:default
   ```
-  * [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/)
+  * [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```
 
 This will create a ksonnet application in the folder you ran the kubeflow deploy script called ```<project-name>_ks_app```. Run the following commands from that folder:
 
   * [Create an NFS disk named nfs-1](https://www.kubeflow.org/docs/guides/advanced/)
+    * Create the disk, for example with gcloud:
+    ```
+     gcloud compute disks create --project=<my-project> --zone=<my-zone> nfs-1 --description="PD to back NFS storage on GKE." --size=1TB
+     ```
+     * Set the kubeflow disks parameter
+     ```
+     ks param set kubeflow-core disks nfs-1
+     ```
   * Install Seldon and Argo
   ```
      ks generate seldon seldon
