@@ -8,7 +8,7 @@ from six.moves import urllib
 if __name__ == '__main__':
     try:
         mnist = fetch_mldata('MNIST original')
-    except urllib.error.HTTPError as ex:
+    except:
         print("Could not download MNIST data from mldata.org, trying alternative...")
 
         # Alternative method to load MNIST, if mldata.org is down
