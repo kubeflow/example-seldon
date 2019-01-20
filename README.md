@@ -29,48 +29,46 @@ In the follow we will:
 
 # Requirements
 
- * Kubectl
- * Ksonnet
- * Argo
+ * gcloud
+ * kubectl
+ * ksonnet
+ * argo
+
 
 # Setup
 
-  * Give auth to your account for Argo
-  ```
-  kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
-  kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow:default
-  ```
-  * [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```
+  1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set.
 
-This will create a ksonnet application in the folder you ran the kubeflow deploy script called ```<project-name>_ks_app```. Run the following commands from that folder:
+  1. Install seldon. Go to your Ksonnet application folder setup in the previous step and run
+  ```
+    cd ${KUBEFLOW_SRC}/${KFAPP}/ks_app
 
-  * [Create an NFS disk named nfs-1](https://www.kubeflow.org/docs/guides/advanced/)
-    * Create the disk, for example with gcloud:
-    ```
-     gcloud compute disks create --project=<my-project> --zone=<my-zone> nfs-1 --description="PD to back NFS storage on GKE." --size=1TB
-     ```
-     * Set the kubeflow disks parameter
-     ```
-     ks param set kubeflow-core disks nfs-1
-     ```
-  * Install Seldon and Argo
+    ks pkg install kubeflow/seldon
+    ks generate seldon seldon
+    ks apply default -c seldon
   ```
-     ks generate seldon seldon
-     ks generate argo argo
-     ks apply default
+  1. Install Helm
   ```
-  * Install seldon grafana dashboard
+    kubectl -n kube-system create sa tiller
+    kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+    helm init --service-account tiller
+    kubectl rollout status deploy/tiller-deploy -n kube-system
   ```
-  kubectl -n kube-system create sa tiller
-  kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
-  helm init --service-account tiller
-  helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts --namespace kubeflow
+  1. Create an NFS disk and persistent volume claim called `nfs-1`. You can follow one guide on create an NFS volume using Google Filestore [here](https://cloud.google.com/community/tutorials/gke-filestore-dynamic-provisioning). A consolidated set of steps is shown [here](nfs.md)
+  1. Add Cluster Roles so Argo can start jobs successfully
   ```
-  * Port forward the dashboard when running
+    kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
+    kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow:default
+  ```
+  1. Install Seldon Analytics Dashboard
+  ```
+    helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts --namespace kubeflow
+  ```
+  1. Port forward the dashboard when running
   ```
      kubectl port-forward $(kubectl get pods -n kubeflow -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n kubeflow 3000:3000
   ```
-  * Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1 and login using "admin" and the password you set above when launching with helm.
+  1. Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1 and login using "admin" and the password you set above when launching with helm.
 
 # MNIST models
 

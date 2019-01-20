@@ -77,6 +77,7 @@ def predict_rest_mnist(mnist):
     #print("Route:"+json.dumps(predictions["meta"]["routing"],indent=2))
     fpreds = [ '%.2f' % elem for elem in predictions["data"]["ndarray"][0] ]
     m = dict(zip(predictions["data"]["names"],fpreds))
+    print("Returned probabilities")
     print(json.dumps(m,indent=2))
 
 
@@ -89,8 +90,10 @@ def predict_grpc_mnist(mnist):
     resp = grpc_request("mnist-classifier",data)
     predictions = MessageToJson(resp)
     predictions = json.loads(predictions)
+    print(json.dumps(predictions,indent=2))    
     fpreds = [ '%.2f' % elem for elem in predictions["data"]["tensor"]["values"] ]
     m = dict(zip(predictions["data"]["names"],fpreds))
+    print("Returned probabilities")    
     print(json.dumps(m,indent=2))
 
 def evaluate_abtest(mnist,sz=100):
