@@ -7,6 +7,9 @@ predict.mnist <- function(mnist,newdata=list()) {
   predict(mnist$model, newdata = newdata, type='prob')
 }
 
+send_feedback.mnist <- function(mnist,request=list(),reward=1,truth=list()) {
+}
+
 new_mnist <- function(filename) {
   model <- readRDS(filename)
   structure(list(model=model), class = "mnist")

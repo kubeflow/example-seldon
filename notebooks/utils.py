@@ -17,7 +17,8 @@ def rest_request(deploymentName,request):
     response = requests.post(
                 "http://"+AMBASSADOR_API_IP+"/seldon/"+deploymentName+"/api/v0.1/predictions",
                 json=request)
-    return response.json()   
+    j = response.json()
+    return j
     
 def rest_request_auth(deploymentName,data,username,password):
     payload = {"data":{"ndarray":data.tolist()}}
@@ -72,7 +73,8 @@ def predict_rest_mnist(mnist):
     features = ["X"+str(i+1) for i in range (0,784)]
     request = {"data":{"names":features,"ndarray":data.tolist()}}
     predictions = rest_request("mnist-classifier",request)
-    print("Route:"+json.dumps(predictions["meta"]["routing"],indent=2))
+    print(json.dumps(predictions,indent=2))
+    #print("Route:"+json.dumps(predictions["meta"]["routing"],indent=2))
     fpreds = [ '%.2f' % elem for elem in predictions["data"]["ndarray"][0] ]
     m = dict(zip(predictions["data"]["names"],fpreds))
     print(json.dumps(m,indent=2))

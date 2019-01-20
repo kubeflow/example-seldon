@@ -1,5 +1,5 @@
 {
-    "apiVersion": "machinelearning.seldon.io/v1alpha1",
+    "apiVersion": "machinelearning.seldon.io/v1alpha2",
     "kind": "SeldonDeployment",
     "metadata": {
 	"labels": {
@@ -10,16 +10,17 @@
     "spec": {
 	"annotations": {
 	    "project_name": "kubeflow-seldon",
-	    "deployment_version": "v1"
+	    "deployment_version": "v1",
+	    "seldon.io/rest-connection-timeout": "100"	    
 	},
 	"name": "mnist-classifier",
 	"predictors": [
 	    {
-		"componentSpec": {
+		"componentSpecs": [{
 		    "spec": {
 			"containers": [
 			    {
-                                "image": "seldonio/deepmnistclassifier_runtime:0.1",
+                                "image": "seldonio/deepmnistclassifier_runtime:0.2",
 				"name": "tf-model",
                                 "volumeMounts": [
                                     {
@@ -29,7 +30,7 @@
                                 ]
 			    },
 			    {
-                                "image": "seldonio/skmnistclassifier_runtime:0.1",
+                                "image": "seldonio/skmnistclassifier_runtime:0.2",
 				"name": "sk-model",
                                 "volumeMounts": [
                                     {
@@ -50,7 +51,7 @@
                             }
                         ]
 		    }
-		},
+		}],
 		"name": "mnist-classifier",
 		"replicas": 1,
 		"annotations": {
