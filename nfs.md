@@ -5,7 +5,7 @@ The steps below are a consolidated set of steps following the guide [here](https
 Set the following variables
 
   * `FS` : the name of your filestore
-  * `PROJECT : Your Google Project
+  * `PROJECT` : Your Google Project
   * `ZONE` : Your GCP Zone
 
 Create a Google Filestore and install the helm chart for nfs-client-provisioner to use it.

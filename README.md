@@ -37,6 +37,8 @@ In the follow we will:
 
 # Setup
 
+  There is a consolidated script to create the demo which can be found [here](./scripts/README.md). For a step by step guide do the following:
+
   1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set.
 
   1. Install seldon. Go to your Ksonnet application folder setup in the previous step and run
