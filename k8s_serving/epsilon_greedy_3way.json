@@ -1,5 +1,5 @@
 {
-    "apiVersion": "machinelearning.seldon.io/v1alpha1",
+    "apiVersion": "machinelearning.seldon.io/v1alpha2",
     "kind": "SeldonDeployment",
     "metadata": {
 	"labels": {
@@ -15,11 +15,11 @@
 	"name": "mnist-classifier",
 	"predictors": [
 	    {
-		"componentSpec": {
+		"componentSpecs": [{
 		    "spec": {
 			"containers": [
 			    {
-                                "image": "seldonio/deepmnistclassifier_runtime:0.1",
+                                "image": "seldonio/deepmnistclassifier_runtime:0.2",
 				"name": "tf-model",
                                 "volumeMounts": [
                                     {
@@ -29,7 +29,7 @@
                                 ]
 			    },
 			    {
-                                "image": "seldonio/skmnistclassifier_runtime:0.1",
+                                "image": "seldonio/skmnistclassifier_runtime:0.2",
 				"name": "sk-model",
                                 "volumeMounts": [
                                     {
@@ -39,7 +39,7 @@
                                 ]
 			    },
 			    {
-                                "image": "seldonio/rmnistclassifier_runtime:0.1",
+                                "image": "seldonio/rmnistclassifier_runtime:0.2",
 				"name": "r-model",
                                 "volumeMounts": [
                                     {
@@ -64,7 +64,7 @@
                             }
                         ]
 		    }
-		},
+		}],
 		"name": "mnist-classifier",
 		"replicas": 1,
 		"annotations": {

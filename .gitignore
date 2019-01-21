@@ -21,3 +21,10 @@ _*.json
 
 models/tf_mnist/runtime/build/
 models/sk_mnist/runtime/build/
+
+models/sk_mnist/train/mnist-original.mat
+notebooks/proto/prediction_pb2.py
+notebooks/proto/prediction_pb2_grpc.py
+notebooks/tensorflow
+scripts/kubeflow_src
+scripts/env.sh
