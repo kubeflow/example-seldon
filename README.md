@@ -42,34 +42,34 @@ In the follow we will:
   1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set.
 
   1. Install seldon. Go to your Ksonnet application folder setup in the previous step and run
-  ```
-    cd ${KUBEFLOW_SRC}/${KFAPP}/ks_app
+      ```
+      cd ${KUBEFLOW_SRC}/${KFAPP}/ks_app
 
-    ks pkg install kubeflow/seldon
-    ks generate seldon seldon
-    ks apply default -c seldon
-  ```
+      ks pkg install kubeflow/seldon
+      ks generate seldon seldon
+      ks apply default -c seldon
+      ```
   1. Install Helm
-  ```
-    kubectl -n kube-system create sa tiller
-    kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
-    helm init --service-account tiller
-    kubectl rollout status deploy/tiller-deploy -n kube-system
-  ```
+      ```
+      kubectl -n kube-system create sa tiller
+      kubectl create clusterrolebinding tiller --clusterrole cluster-admin --serviceaccount=kube-system:tiller
+      helm init --service-account tiller
+      kubectl rollout status deploy/tiller-deploy -n kube-system
+      ```
   1. Create an NFS disk and persistent volume claim called `nfs-1`. You can follow one guide on create an NFS volume using Google Filestore [here](https://cloud.google.com/community/tutorials/gke-filestore-dynamic-provisioning). A consolidated set of steps is shown [here](nfs.md)
   1. Add Cluster Roles so Argo can start jobs successfully
-  ```
-    kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
-    kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow:default
-  ```
+      ```
+      kubectl create clusterrolebinding my-cluster-admin-binding --clusterrole=cluster-admin --user=$(gcloud info --format="value(config.account)")
+      kubectl create clusterrolebinding default-admin2 --clusterrole=cluster-admin --serviceaccount=kubeflow:default
+      ```
   1. Install Seldon Analytics Dashboard
-  ```
-    helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts --namespace kubeflow
-  ```
+      ```
+      helm install seldon-core-analytics --name seldon-core-analytics --set grafana_prom_admin_password=password --set persistence.enabled=false --repo https://storage.googleapis.com/seldon-charts --namespace kubeflow
+      ```
   1. Port forward the dashboard when running
-  ```
-     kubectl port-forward $(kubectl get pods -n kubeflow -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n kubeflow 3000:3000
-  ```
+      ```
+      kubectl port-forward $(kubectl get pods -n kubeflow -l app=grafana-prom-server -o jsonpath='{.items[0].metadata.name}') -n kubeflow 3000:3000
+      ```
   1. Visit http://localhost:3000/dashboard/db/prediction-analytics?refresh=5s&orgId=1 and login using "admin" and the password you set above when launching with helm.
 
 # MNIST models
