@@ -5,6 +5,6 @@ data:
 kind: Secret
 metadata:
   name: docker-credentials
-  namespace: default
+  namespace: kubeflow
 type: Opaque
 
