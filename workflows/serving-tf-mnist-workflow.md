@@ -6,7 +6,7 @@ Comments on the [serving-tf-mnist-workflow.yaml](serving-tf-mnist-workflow.yaml)
 
 To serve our runtime model we create:
 
- * [```models/tf_mnist/runtime/wrap.sh```](models/tf_mnist/runtime/wrap.sh) to wrap model using the seldon-core python wrapper.
+ * [```models/tf_mnist/runtime/wrap.sh```](../models/tf_mnist/runtime/wrap.sh) to wrap model using the seldon-core python wrapper.
  * An Argo workflow to:
     * Wrap the runtime model, builds a docker container for it and optionally push it to your repo
     * Starts a seldon deployment that will run and expose your model
@@ -24,6 +24,8 @@ To serve our runtime model we create:
    * The Docker user to use when pushing an image to DockerHub
  * build-push-image
    * Whether to build and push the image to an external repo on DockerHub (true/false)
+ * deploy-model
+   * Whether to start a seldon deployment to run and expose your model (true/false)
 
 
 
