@@ -6,8 +6,8 @@ Comments on the [training-tf-mnist-workflow.yaml](training-tf-mnist-workflow.yam
 
 To dockerize our model training and run it we create:
 
-  * [```models/tf_mnist/train/build_and_push.sh```](models/tf_mnist/train/build_and_push.sh) that will build an image for our Tensorflow training and push to our repo.
-  * An Argo workflow [```workflows/training-tf-mnist-workflow.yaml```](workflows/training-tf-mnist-workflow.yaml) is created which:
+  * [```models/tf_mnist/train/build_and_push.sh```](../models/tf_mnist/train/build_and_push.sh) that will build an image for our Tensorflow training and push to our repo.
+  * An Argo workflow [```workflows/training-tf-mnist-workflow.yaml```](training-tf-mnist-workflow.yaml) is created which:
     * Clones the project from github
     * Runs the build and push script (using DockerInDocker)
     * Starts a kubeflow TfJob to train the model and save the results to the persistent volume
@@ -30,7 +30,7 @@ To dockerize our model training and run it we create:
 
 ## Setup For Pushing Images
 
-We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in ```k8s_setup/docker-credentials-secret.yaml.tpl```
+We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in [```k8s_setup/docker-credentials-secret.yaml.tpl```](../k8s_setup/docker-credentials-secret.yaml.tpl)
 
 On unix you can create base64 encoded versions of your credentials with the [base64](https://linux.die.net/man/1/base64) tool.
 
