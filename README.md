@@ -112,6 +112,6 @@ Follow the steps in [./notebooks/serving.ipynb](./notebooks/serving.ipynb) to:
  2. Do a rolling update to an AB test of the Tensorflow model and the sklearn model.
  3. Do a rolling update to a Multi-armed Bandit over all 3 models to direct traffic in real time to the best model.
 
-If you have [installed the Seldon-Core analytics](setup.md#grafana-dashboard) you can view them on the grafana dashboard:
+If you have [installed the Seldon-Core analytics](#setup) you can view them on the grafana dashboard:
 
 ![Grafana](grafana.png "Grafana Dashboard")
