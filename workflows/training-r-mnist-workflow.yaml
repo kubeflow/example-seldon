@@ -75,7 +75,7 @@ spec:
          - apiVersion: argoproj.io/v1alpha1
            kind: Workflow
            controller: true
-           name: kubeflow-train
+           name: {{workflow.name}}
            uid: {{workflow.uid}}
        spec: 
          template: 
