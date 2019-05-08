@@ -1,14 +1,12 @@
-FROM rocker/r-base
+FROM rocker/r-apt:bionic
 
-RUN apt-get update -qq && apt-get install -y \
-      git-core \
-      libssl-dev \
-      libcurl4-gnutls-dev
+RUN apt-get update && \
+    apt-get install -y -qq \
+    	r-cran-caret \
+    	r-cran-pls \
+    	r-cran-e1071
 
-COPY /install.R /tmp/
-RUN cd /tmp && \
-    Rscript install.R
-
+RUN R -e 'install.packages("doParallel")'
 
 RUN mkdir training
 COPY /train.R /training/train.R
