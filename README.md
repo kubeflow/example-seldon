@@ -6,7 +6,7 @@ Using:
 
  * [kubeflow](https://github.com/kubeflow/kubeflow)
  * [seldon-core](https://github.com/SeldonIO/seldon-core)
- 
+
 The example will be the MNIST handwritten digit classification task. We will train 3 different models to solve this task:
 
  * A TensorFlow neural network model.
@@ -39,7 +39,7 @@ In the follow we will:
 
   There is a consolidated script to create the demo which can be found [here](./scripts/README.md). For a step by step guide do the following:
 
-  1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set.
+  1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set. OAUTH is preferred as with basic auth https://github.com/kubeflow/kubeflow/issues/3213
 
   1. Install seldon. Go to your Ksonnet application folder setup in the previous step and run
       ```
@@ -102,7 +102,7 @@ In the follow we will:
    * Create runtime prediction images and push to repo
    * Deploy individual runtime model
 
-**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret using the template in [k8s_setup/docker-credentials-secret.yaml.tpl](k8s_setup/docker-credentials-secret.yaml.tpl).**
+**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret containing a [config.json](https://www.projectatomic.io/blog/2016/03/docker-credentials-store/). For convenience a [generate-docker-secret.sh](./scripts/generate-docker-secret.sh) script is provided for use with public dockerhub.**
 
 # Serve the Models
 

@@ -13,6 +13,6 @@ done;
 docker build . -t ${REPO}/${IMAGE}:${VERSION}
 docker images 
 echo "Pushing image to ${REPO}/${IMAGE}:${VERSION}"
-echo $DOCKER_PASSWORD | docker login --username=$DOCKER_USERNAME --password-stdin 
+echo $DOCKER_PASSWORD | docker login --username=$DOCKER_USERNAME --password-stdin
 docker push ${REPO}/${IMAGE}:${VERSION}
 
