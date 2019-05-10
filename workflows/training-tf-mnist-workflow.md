@@ -18,15 +18,15 @@ To dockerize our model training and run it we create:
  * version
    * The version tag for the Docker image
  * github-user
-   * The github user to use to clone this repo
+   * The github user/org for which to clone this repo/fork
  * github-revision
    * The github revision to use for cloning the repo (can be a branch name)
- * docker-user
-   * The Docker user to use when pushing an image to DockerHub
+ * docker-org
+   * The Docker host and org/user/project to use when pushing an image to the registry
  * tfjob-version-hack
    * A temporary random integer for the tfjob ID
  * build-push-image
-   * Whether to build and push the image to an external repo on DockerHub (true/false)
+   * Whether to build and push the image to docker registry (true/false)
 
 ## Setup For Pushing Images
 
@@ -53,4 +53,3 @@ Apply the secret:
 ```bash
 kubectl create -f my_docker_credentials.yaml
 ```
-

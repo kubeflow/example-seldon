@@ -78,19 +78,19 @@ In the follow we will:
 
  * [Python training code](models/tf_mnist/train/create_model.py)
  * [Python runtime prediction code](models/tf_mnist/runtime/DeepMnist.py)
- * [Script to create wrap runtime prediction code to run under seldon-Core](models/tf_mnist/runtime/wrap.sh).
+ * [Dockerfile to wrap runtime prediction code to run under seldon-Core](models/tf_mnist/runtime/Dockerfile).
 
 ## SKLearn Model
 
  * [Python training code](models/sk_mnist/train/create_model.py)
  * [Python runtime prediction code](models/sk_mnist/runtime/SkMnist.py)
- * [Script to create wrap runtime prediction code to run under seldon-Core](models/sk_mnist/runtime/wrap.sh).
+ * [Dockerfile to wrap runtime prediction code to run under seldon-Core](models/sk_mnist/runtime/Dockerfile).
 
 ## R Model
 
  * [R training code](models/r_mnist/train/train.R)
  * [R runtime prediction code](models/r_mnist/runtime/mnist.R)
- * [Script to create wrap runtime prediction code to run under seldon-Core](models/r_mnist/runtime/wrap.sh).
+ * [Dockerfile to wrap runtime prediction code to run under seldon-Core](models/r_mnist/runtime/Dockerfile).
 
 # Train the Models
 
