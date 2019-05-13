@@ -102,7 +102,7 @@ In the follow we will:
    * Create runtime prediction images and push to repo
    * Deploy individual runtime model
 
-**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret containing a [config.json](https://www.projectatomic.io/blog/2016/03/docker-credentials-store/). For convenience a [generate-docker-secret.sh](./scripts/generate-docker-secret.sh) script is provided for use with public dockerhub.**
+**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret containing a [config.json](https://www.projectatomic.io/blog/2016/03/docker-credentials-store/). To do this you can find your docker home (typically ~/.docker) and run `kubectl create secret generic docker-config --from-file=config.json=${DOCKERHOME}/config.json --type=kubernetes.io/config` to (create a secret)[https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials].**
 
 # Serve the Models
 

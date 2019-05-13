@@ -30,26 +30,4 @@ To dockerize our model training and run it we create:
 
 ## Setup For Pushing Images
 
-We need to add secrets to allow us to push to our docker repo. Create a kubernetes secret of the form shown in the template in [```k8s_setup/docker-credentials-secret.yaml.tpl```](../k8s_setup/docker-credentials-secret.yaml.tpl)
-
-On unix you can create base64 encoded versions of your credentials with the [base64](https://linux.die.net/man/1/base64) tool.
-
-Enter the data into a manifest as below:
-
-```yaml
-apiVersion: v1
-data:
-  password: <base 64 password>
-  username: <base 64 username>
-kind: Secret
-metadata:
-  name: docker-credentials
-  namespace: default
-type: Opaque
-```
-
-Apply the secret:
-
-```bash
-kubectl create -f my_docker_credentials.yaml
-```
+**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret containing a [config.json](https://www.projectatomic.io/blog/2016/03/docker-credentials-store/). To do this you can find your docker home (typically ~/.docker) and run `kubectl create secret generic docker-config --from-file=config.json=${DOCKERHOME}/config.json --type=kubernetes.io/config` to (create a secret)[https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials].**
