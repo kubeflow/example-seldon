@@ -6,7 +6,7 @@ Using:
 
  * [kubeflow](https://github.com/kubeflow/kubeflow)
  * [seldon-core](https://github.com/SeldonIO/seldon-core)
- 
+
 The example will be the MNIST handwritten digit classification task. We will train 3 different models to solve this task:
 
  * A TensorFlow neural network model.
@@ -39,7 +39,7 @@ In the follow we will:
 
   There is a consolidated script to create the demo which can be found [here](./scripts/README.md). For a step by step guide do the following:
 
-  1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set.
+  1. [Install kubeflow on GKE](https://www.kubeflow.org/docs/started/getting-started-gke/). This should create kubeflow in a namespace ```kubeflow```. We suggest you use the command line install so you can easily modify your Ksonnet installation. Ensure you have the environment variables `KUBEFLOW_SRC` and `KFAPP` set. OAUTH is preferred as with basic auth [port-forwarding to ambassador is insufficient](https://github.com/kubeflow/kubeflow/issues/3213)
 
   1. Install seldon. Go to your Ksonnet application folder setup in the previous step and run
       ```
@@ -78,19 +78,19 @@ In the follow we will:
 
  * [Python training code](models/tf_mnist/train/create_model.py)
  * [Python runtime prediction code](models/tf_mnist/runtime/DeepMnist.py)
- * [Script to create wrap runtime prediction code to run under seldon-Core](models/tf_mnist/runtime/wrap.sh) using [Source-to-Image](https://github.com/openshift/source-to-image).
+ * [Dockerfile to wrap runtime prediction code to run under seldon-Core](models/tf_mnist/runtime/Dockerfile).
 
 ## SKLearn Model
 
  * [Python training code](models/sk_mnist/train/create_model.py)
  * [Python runtime prediction code](models/sk_mnist/runtime/SkMnist.py)
- * [Script to create wrap runtime prediction code to run under seldon-Core](models/sk_mnist/runtime/wrap.sh) using [Source-to-Image](https://github.com/openshift/source-to-image).
+ * [Dockerfile to wrap runtime prediction code to run under seldon-Core](models/sk_mnist/runtime/Dockerfile).
 
 ## R Model
 
  * [R training code](models/r_mnist/train/train.R)
  * [R runtime prediction code](models/r_mnist/runtime/mnist.R)
- * [Script to create wrap runtime prediction code to run under seldon-Core](models/r_mnist/runtime/wrap.sh) using [Source-to-Image](https://github.com/openshift/source-to-image).
+ * [Dockerfile to wrap runtime prediction code to run under seldon-Core](models/r_mnist/runtime/Dockerfile).
 
 # Train the Models
 
@@ -102,7 +102,7 @@ In the follow we will:
    * Create runtime prediction images and push to repo
    * Deploy individual runtime model
 
-**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret using the template in [k8s_setup/docker-credentials-secret.yaml.tpl](k8s_setup/docker-credentials-secret.yaml.tpl).**
+**To push to your own repo the Docker images you will need to setup your docker credentials as a Kubernetes secret containing a [config.json](https://www.projectatomic.io/blog/2016/03/docker-credentials-store/). To do this you can find your docker home (typically ~/.docker) and run `kubectl create secret generic docker-config --from-file=config.json=${DOCKERHOME}/config.json --type=kubernetes.io/config` to [create a secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#registry-secret-existing-credentials).**
 
 # Serve the Models
 

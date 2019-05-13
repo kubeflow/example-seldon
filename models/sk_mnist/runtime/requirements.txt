@@ -1,2 +1,3 @@
 scipy>= 0.13.3
 scikit-learn>=0.18
+seldon-core>=0.2.5

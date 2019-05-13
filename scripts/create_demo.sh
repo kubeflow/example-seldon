@@ -7,15 +7,13 @@ set -o pipefail
 create_src() {
     mkdir -p ${KUBEFLOW_SRC}
     cd ${KUBEFLOW_SRC}
-    #export KUBEFLOW_TAG=v0.4.1
-    export KUBEFLOW_TAG=master
     curl https://raw.githubusercontent.com/kubeflow/kubeflow/${KUBEFLOW_TAG}/scripts/download.sh | bash
 }
 
 
 launch_kubeflow() {
     
-    KUBEFLOW_REPO=${KUBEFLOW_SRC} ${KUBEFLOW_SRC}/scripts/kfctl.sh init ${KFAPP} --platform gcp --project seldon-demos
+    KUBEFLOW_REPO=${KUBEFLOW_SRC} ${KUBEFLOW_SRC}/scripts/kfctl.sh init ${KFAPP} --platform gcp --project ${PROJECT}
     
     cd ${KFAPP}
     ${KUBEFLOW_SRC}/scripts/kfctl.sh generate platform

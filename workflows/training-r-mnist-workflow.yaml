@@ -11,57 +11,58 @@ spec:
     - name: github-user
       value: kubeflow
     - name: github-revision
-      value: master      
-    - name: docker-user
+      value: master
+    - name: docker-org
       value: seldonio
     - name: build-push-image
-      value: false      
+      value: false
   volumes:
-  - name: my-secret-vol
+  - name: docker-config
     secret:
-      secretName: docker-credentials     # name of an existing k8s secret
+      secretName: docker-config     # name of an existing k8s secret
+  volumeClaimTemplates:
+  - metadata:
+      name: workspace
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 0.5Gi
   templates:
   - name: workflow
     steps:
-    - - name: build-push 
+    - - name: get-source
+        template: get-source-code
+    - - name: build-push
         template: build-and-push
         when: "{{workflow.parameters.build-push-image}} == true"
     - - name: train
         template: tfjob
-  - name: build-and-push
+  - name: get-source-code
     inputs:
       artifacts:
       - name: argo-source
         path: /src/example-seldon
         git:
           repo: https://github.com/{{workflow.parameters.github-user}}/example-seldon.git
-          revision: "{{workflow.parameters.github-revision}}"          
+          revision: "{{workflow.parameters.github-revision}}"
     container:
-      image: docker:17.10
-      command: [sh,-c]
-      args: ["cd /src/example-seldon/models/r_mnist/train ; ./build_and_push.sh {{workflow.parameters.version}} {{workflow.parameters.docker-user}}"]
-      env:
-      - name: DOCKER_HOST               #the docker daemon can be access on the standard port on localhost
-        value: 127.0.0.1
-      - name: DOCKER_USERNAME  # name of env var
-        valueFrom:
-          secretKeyRef:
-            name: docker-credentials     # name of an existing k8s secret
-            key: username     # 'key' subcomponent of the secret
-      - name: DOCKER_PASSWORD  # name of env var
-        valueFrom:
-          secretKeyRef:
-            name: docker-credentials     # name of an existing k8s secret
-            key: password     # 'key' subcomponent of the secret
+      image: alpine:latest
+      command: [sh, -c]
+      args: ["cp /src/example-seldon/models/r_mnist/train/* /workspace/; ls /workspace/"]
       volumeMounts:
-      - name: my-secret-vol     # mount file containing secret at /secret/mountpath
-        mountPath: "/secret/mountpath"
-    sidecars:
-    - name: dind
-      image: docker:17.10-dind          #Docker already provides an image for running a Docker daemon
-      securityContext:
-        privileged: true                #the Docker daemon can only run in a privileged container
-      mirrorVolumeMounts: true
+      - name: workspace
+        mountPath: /workspace
+  - name: build-and-push
+    container:
+      image: gcr.io/kaniko-project/executor:latest
+      args: ["--dockerfile","Dockerfile","--destination","{{workflow.parameters.docker-org}}/rmnistclassifier_trainer:{{workflow.parameters.version}}"]
+      workingDir: /src/example-seldon/models/r_mnist/train/
+      volumeMounts:
+      - name: docker-config
+        mountPath: "/root/.docker/"
+      - name: workspace
+        mountPath: /workspace
   - name: tfjob
     resource:                   #indicates that this is a resource template
       action: create             #can be any kubectl action (e.g. create, delete, apply, patch)
@@ -69,7 +70,7 @@ spec:
       manifest: |   #put your kubernetes spec here
        apiVersion: "batch/v1"
        kind: "Job"
-       metadata: 
+       metadata:
          name: "r-train"
          ownerReferences:
          - apiVersion: argoproj.io/v1alpha1
@@ -77,23 +78,22 @@ spec:
            controller: true
            name: {{workflow.name}}
            uid: {{workflow.uid}}
-       spec: 
-         template: 
-           metadata: 
+       spec:
+         template:
+           metadata:
              name: "r-train"
-           spec: 
-             containers: 
-               - 
-                 image: "{{workflow.parameters.docker-user}}/rmnistclassifier_trainer:{{workflow.parameters.version}}"
+           spec:
+             containers:
+               -
+                 image: "{{workflow.parameters.docker-org}}/rmnistclassifier_trainer:{{workflow.parameters.version}}"
                  name: "r-train"
-                 volumeMounts: 
-                   - 
+                 volumeMounts:
+                   -
                      mountPath: "/data"
                      name: "persistent-storage"
              restartPolicy: "Never"
-             volumes: 
-               - 
+             volumes:
+               -
                  name: "persistent-storage"
-                 persistentVolumeClaim: 
+                 persistentVolumeClaim:
                    claimName: "nfs-1"
-
