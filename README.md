@@ -1,3 +1,8 @@
+## :warning: **kubeflow/example-seldon is not maintained**
+
+This repository has been deprecated, and will be [archived](https://github.com/kubeflow/community/issues/479) soon (Nov 30th, 2021). 
+
+
 # Train and Deploy Machine Learning Models on Kubernetes with Kubeflow and Seldon-Core
 
 ![MNIST](notebooks/mnist.png "MNIST Digits")
